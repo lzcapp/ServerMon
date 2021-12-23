@@ -1,0 +1,103 @@
+@font-face {
+    font-family: 'Fira Code';
+    src:url("font/FiraCode-VF.woff2")；
+}
+
+html {
+    background-color: #222;
+    padding: 6%;
+}
+
+body {
+    color: antiquewhite;
+    margin: 0;
+}
+
+pre, div, h1, h2 {
+    font-size: 1.2em;
+    font-weight: 500;
+    font-family: 'Fira Code', 'Cascadia Code', 'Ubuntu Mono', 'Source Code Pro', monospace !important;
+}
+
+h1 {
+    font-size: 3em;
+}
+
+h2 {
+    font-size: 1.6em;
+}
+
+.left {
+    text-align: left;
+    float: left;
+}
+
+.right {
+    text-align: right;
+    float: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.module {
+    background-color: #333;
+    border-radius: 15px;
+    padding: 1%;
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+.unit {
+    color: #d7e6fa;
+    font-weight: 400;
+    padding-left: 5px;
+}
+
+.type {
+    color: #d7e6fa;
+    font-weight: 400;
+}
+
+.slash {
+    color: #d7e6fa;
+    font-weight: 400;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.bar {
+    display: flex;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    float: none;
+}
+
+.element {
+    width: 1vw;
+    height: 0.5vh;
+    background-color: #666;
+    border-radius: 10%;
+    margin: 0 1px;
+}
+
+.usr {
+    background-color: #93dc6f;
+}
+
+.sys {
+    background-color: #dc6f93;
+}
+
+.blu {
+    background-color: #bf5af1;
+}
+
+.yel {
+    background-color: #cadc6f;
+}
+
+.space {
+    height: 25px;
+}
