@@ -162,7 +162,7 @@ echo "<h2>$output1 [$output2]</h2><br/>";
     $used1 = $total - $free1 - $cache - $buffs;
     
     echo "<div class=\"left\"><span class=\"type\">MEM</span></div>";
-    echo "<div class=\"right\">$avail" . "<span class=\"slash\">/</span>" . "$total" . "<span class=\"unit\">GB</span></div><br/><br/>";
+    echo "<div class=\"right\">$used1" . "<span class=\"slash\">/</span>" . "$total" . "<span class=\"unit\">GB</span></div><br/><br/>";
 
     $usedp = floor(floatval($used1) / floatval($total) * 100);
     $buffp = floor(floatval($buffs) / floatval($total) * 100);
@@ -198,10 +198,12 @@ echo "<h2>$output1 [$output2]</h2><br/>";
     $swap2 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $swap2);
     $swap2 = number_format(floatval($swap2) / 1024 /1024, 2);
 
+    $freep = floor(floatval($swap1) / floatval($swap2) * 100);
+
+    $swap1 = $swap2 - $swap1;
+
     echo "<div class=\"left\"><span class=\"type\">SWAP</span></div>";
     echo "<div class=\"right\">$swap1" . "<span class=\"slash\">/</span>" . "$swap2" . "<span class=\"unit\">GB</span></div><br/><br/>";
-
-    $freep = floor(floatval($swap1) / floatval($swap2) * 100);
 
     $bar = "<div class=\"bar\">\n";
     for ($i = 0; $i < 100 - $freep; $i++)
@@ -260,7 +262,7 @@ echo "<h2>$output1 [$output2]</h2><br/>";
 
     echo "<br/>";
     echo "<div class=\"left\"><span class=\"type\">USE</span></div>";
-    echo "<div class=\"right\"><span class=\"unit\">" . "$mempt" . "</span></div><br/><br/>";
+    echo "<div class=\"right\">" . "$gpupt" . "<span class=\"unit\">%</span></div><br/><br/>";
 
     $bar = "<div class=\"bar\">\n";
     for ($i = 0; $i < $gpupt; $i++)
