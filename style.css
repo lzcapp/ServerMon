@@ -11,7 +11,7 @@ html {
 }
 
 body {
-    color: antiquewhite;
+    color: #BFD0D8;
     margin: 0;
 }
 
@@ -52,18 +52,18 @@ h2 {
 }
 
 .unit {
-    color: #d7e6fa;
+    color: #D0D8BF;
     font-weight: 400;
     padding-left: 5px;
 }
 
 .type {
-    color: #d7e6fa;
+    color: #D0D8BF;
     font-weight: 400;
 }
 
 .slash {
-    color: #d7e6fa;
+    color: #D0D8BF;
     font-weight: 400;
     padding-left: 3px;
     padding-right: 3px;
