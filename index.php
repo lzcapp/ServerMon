@@ -15,18 +15,27 @@
 
 <?php
 
-$output = shell_exec('hostname');
-echo "<h1>$output</h1>";
+$hostn = shell_exec('hostname');
+echo "<h1>$hostn</h1>";
 
-$output1 = shell_exec('lsb_release -a | grep Description');
-$output1 = str_replace(array("\r\n", "\r", "\n", "\t"), "", $output1);
-$pos1 = strpos($output1, ':');
-$output1 = substr($output1, $pos1 + 1);
-$output2 = shell_exec('lsb_release -a | grep Codename');
-$output2 = str_replace(array("\r\n", "\r", "\n", "\t"), "", $output2);
-$pos2 = strpos($output2, ':');
-$output2 = substr($output2, $pos2 + 1);
-echo "<h2>$output1 [$output2]</h2><br/>";
+$versn = shell_exec('lsb_release -a | grep Description');
+$versn = str_replace(array("\r\n", "\r", "\n", "\t"), "", $versn);
+$verps = strpos($versn, ':');
+$versn = substr($versn, $verps + 1);
+$coden = shell_exec('lsb_release -a | grep Codename');
+$coden = str_replace(array("\r\n", "\r", "\n", "\t"), "", $coden);
+$codep = strpos($coden, ':');
+$coden = substr($coden, $codep + 1);
+
+$uptme = shell_exec('uptime -p');
+$uptme = str_replace(array("\r\n", "\r", "\n", "\t", ","), "", $uptme);
+$uptme = str_replace(array("up"), "<span class=\"type\">UP</span>", $uptme);
+$uptme = str_replace(array(" days ", " day "), "<span class=\"unit\">D</span><span class=\"unit\"></span>", $uptme);
+$uptme = str_replace(array(" hours ", " hour "), "<span class=\"unit\">H</span><span class=\"unit\"></span>", $uptme);
+$uptme = str_replace(array(" minutes", " minute"), "<span class=\"unit\">M</span><span class=\"unit\"></span>", $uptme);
+
+echo "<div class=\"left\"><h2>$versn [$coden]</h2></div>";
+echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
 
 ?>
 
