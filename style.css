@@ -13,6 +13,7 @@ html {
 body {
     color: #BFD0D8;
     margin: 0;
+    padding-bottom: 5%;
 }
 
 pre, div, h1, h2 {
