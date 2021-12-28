@@ -181,10 +181,10 @@ echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>
     for ($i = 0; $i < $usedp; $i++) {
         $bar .= "<i class=\"element usr\"></i>\n";
     }
-    for ($i = $usedp; $i < $usedp + $buffp; $i++) {
+    for ($i = 0; $i < $buffp; $i++) {
         $bar .= "<i class=\"element blu\"></i>\n";
     }
-    for ($i = $usedp + $buffp; $i < $usedp + $buffp + $cachp; $i++) {
+    for ($i = 0; $i < $cachp; $i++) {
         $bar .= "<i class=\"element yel\"></i>\n";
     }
     for ($i = $usedp + $buffp + $cachp; $i < 100; $i++) {
