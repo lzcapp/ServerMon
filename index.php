@@ -30,12 +30,21 @@ $coden = substr($coden, $codep + 1);
 $uptme = shell_exec('uptime -p');
 $uptme = str_replace(array("\r\n", "\r", "\n", "\t", ","), "", $uptme);
 $uptme = str_replace(array("up"), "<span class=\"type\">UP</span>", $uptme);
+$uptme = str_replace(array(" weeks ", " week "), "<span class=\"unit\">W</span><span class=\"unit\"></span>", $uptme);
 $uptme = str_replace(array(" days ", " day "), "<span class=\"unit\">D</span><span class=\"unit\"></span>", $uptme);
 $uptme = str_replace(array(" hours ", " hour "), "<span class=\"unit\">H</span><span class=\"unit\"></span>", $uptme);
 $uptme = str_replace(array(" minutes", " minute"), "<span class=\"unit\">M</span><span class=\"unit\"></span>", $uptme);
 
-echo "<div class=\"left\"><h2>$versn [$coden]</h2></div>";
-echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
+if ($versn == null && $coden == null) {
+    echo "<div class=\"left\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
+} else {
+    if ($coden == null) {
+        echo "<div class=\"left\"><h2>$versn</h2></div>";
+    } else {
+        echo "<div class=\"left\"><h2>$versn [$coden]</h2></div>";
+    }
+    echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
+}
 
 ?>
 
@@ -231,62 +240,72 @@ echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>
 
 <div class="space"></div>
 
-<div class="module">
-    <?php
+<?php
 
-    $model = shell_exec('lshw -c video | grep product');
+$model = exec("lspci | grep VGA");
+
+if ($model != null) {
+    echo '<div class="module">';
+    
     $model = str_replace(array("\r\n", "\r", "\n", "\t"), "", $model);
     $posn1 = strpos($model, ':');
-    $model = substr($model, $posn1 + 2);
-
-    $temp1 = shell_exec('nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader');
-    $temp1 = str_replace(array("\r\n", "\r", "\n", "\t"), "", $temp1);
-    $used1 = shell_exec('nvidia-smi --query-gpu=memory.used --format=csv,noheader');
-    $used1 = str_replace(array("\r\n", "\r", "\n", " ", "MiB"), "", $used1);
-    $total = shell_exec('nvidia-smi --query-gpu=memory.total --format=csv,noheader');
-    $total = str_replace(array("\r\n", "\r", "\n", " ", "MiB"), "", $total);
+    $model = substr($model, $posn1 + 1);
+    $posn2 = strpos($model, ':');
+    $model = substr($model, $posn2 + 2);
 
     echo "<div class=\"left\">$model</div>";
-    echo "<div class=\"right\">$temp1" . "<span class=\"unit\">°C</span></div><br/><br/>";
 
-    echo "<div class=\"left\"><span class=\"type\">MEM</span></div>";
-    echo "<div class=\"right\">$used1" . "<span class=\"slash\">/</span>" . "$total" . "<span class=\"unit\">MB</span></div><br/><br/>";
+    if (strpos($model, 'NVIDIA') !== false) {
 
-    $gpupt = shell_exec('nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader');
-    $gpupt = str_replace(array("\r\n", "\r", "\n", "\t", " ", "%"), "", $gpupt);
-    $mempt = shell_exec('nvidia-smi --query-gpu=utilization.memory --format=csv,noheader');
-    $mempn = str_replace(array("\r\n", "\r", "\n", "\t", " ", "%"), "", $mempt);
+        $temp1 = shell_exec('nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader');
+        $temp1 = str_replace(array("\r\n", "\r", "\n", "\t"), "", $temp1);
+        $used1 = shell_exec('nvidia-smi --query-gpu=memory.used --format=csv,noheader');
+        $used1 = str_replace(array("\r\n", "\r", "\n", " ", "MiB"), "", $used1);
+        $total = shell_exec('nvidia-smi --query-gpu=memory.total --format=csv,noheader');
+        $total = str_replace(array("\r\n", "\r", "\n", " ", "MiB"), "", $total);
+        echo "<div class=\"right\">$temp1" . "<span class=\"unit\">°C</span></div><br/><br/>";
 
-    $bar = "<div class=\"bar\">\n";
-    for ($i = 0; $i < $mempn; $i++)
-    {
-        $bar .= "<i class=\"element usr\"></i>\n";
+        echo "<div class=\"left\"><span class=\"type\">MEM</span></div>";
+        echo "<div class=\"right\">$used1" . "<span class=\"slash\">/</span>" . "$total" . "<span class=\"unit\">MB</span></div><br/><br/>";
+
+        $gpupt = shell_exec('nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader');
+        $gpupt = str_replace(array("\r\n", "\r", "\n", "\t", " ", "%"), "", $gpupt);
+        $mempt = shell_exec('nvidia-smi --query-gpu=utilization.memory --format=csv,noheader');
+        $mempn = str_replace(array("\r\n", "\r", "\n", "\t", " ", "%"), "", $mempt);
+
+        $bar = "<div class=\"bar\">\n";
+        for ($i = 0; $i < $mempn; $i++)
+        {
+            $bar .= "<i class=\"element usr\"></i>\n";
+        }
+        for ($i = 0; $i < 100 - $mempn; $i++)
+        {
+            $bar .= "<i class=\"element\"></i>\n";
+        }
+        $bar .= "</div>\n";
+        print $bar;
+
+        echo "<br/>";
+        echo "<div class=\"left\"><span class=\"type\">USE</span></div>";
+        echo "<div class=\"right\">" . "$gpupt" . "<span class=\"unit\">%</span></div><br/><br/>";
+
+        $bar = "<div class=\"bar\">\n";
+        for ($i = 0; $i < $gpupt; $i++)
+        {
+            $bar .= "<i class=\"element usr\"></i>\n";
+        }
+        for ($i = 0; $i < 100 - $gpupt; $i++)
+        {
+            $bar .= "<i class=\"element\"></i>\n";
+        }
+        $bar .= "</div>\n";
+        print $bar;
+    
+        echo '</div>';
     }
-    for ($i = 0; $i < 100 - $mempn; $i++)
-    {
-        $bar .= "<i class=\"element\"></i>\n";
-    }
-    $bar .= "</div>\n";
-    print $bar;
+}
 
-    echo "<br/>";
-    echo "<div class=\"left\"><span class=\"type\">USE</span></div>";
-    echo "<div class=\"right\">" . "$gpupt" . "<span class=\"unit\">%</span></div><br/><br/>";
-
-    $bar = "<div class=\"bar\">\n";
-    for ($i = 0; $i < $gpupt; $i++)
-    {
-        $bar .= "<i class=\"element usr\"></i>\n";
-    }
-    for ($i = 0; $i < 100 - $gpupt; $i++)
-    {
-        $bar .= "<i class=\"element\"></i>\n";
-    }
-    $bar .= "</div>\n";
-    print $bar;
-
-    ?>
-</div>
+?>
 
 <?php
 
@@ -296,19 +315,32 @@ $array = explode(PHP_EOL, $disks);
 
 $count = count($array);
 
+function  filtrfunction($arr){
+    if($arr === '' || $arr === null){
+        return false;
+    }
+    return true;
+}
+
 for ($i = 1; $i < $count - 1; $i++) {
     $modul = "<div class=\"space\"></div>";
     $modul .= "<div class=\"module\">\n";
 
     $arran = explode(" ", $array[$i]);
-    $arran = array_filter($arran);
+    $arran = array_filter($arran, 'filtrfunction');
     $arran = array_values($arran);
     $perct = str_replace(array("%"), "", $arran[4]);
 
-    $sizun = substr($arran[2], 0, strlen($arran[2]) - 1);
-    $sizuu = substr($arran[2], -1);
-    $siztn = substr($arran[1], 0, strlen($arran[2]) - 1);
+    $siztn = substr($arran[1], 0, strlen($arran[1]) - 1);
     $siztu = substr($arran[1], -1);
+    
+    if ($arran[2] === '0') {
+        $sizun = 0;
+        $sizuu = $siztu;
+    } else {
+        $sizun = substr($arran[2], 0, strlen($arran[2]) - 1);
+        $sizuu = substr($arran[2], -1);
+    }
     
     $modul .= "<div class=\"left\">$arran[0]</div>\n";
     $modul .= "<div class=\"right\"><span class=\"type\">$arran[5]</span></div><br/><br/>\n";
