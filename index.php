@@ -29,6 +29,7 @@ $coden = shell_exec('lsb_release -a | grep Codename');
 $coden = str_replace(array("\r\n", "\r", "\n", "\t"), "", $coden);
 $codep = strpos($coden, ':');
 $coden = substr($coden, $codep + 1);
+$versn = str_replace(array(" (" . $coden . ")"), "", $versn);
 
 $uptme = shell_exec('uptime -p');
 $uptme = str_replace(array("\r\n", "\r", "\n", "\t", ","), "", $uptme);
