@@ -40,15 +40,17 @@ $uptme = str_replace(array(" hours ", " hour "), "<span class=\"unit\">H</span><
 $uptme = str_replace(array(" minutes", " minute"), "<span class=\"unit\">M</span><span class=\"unit\"></span>", $uptme);
 
 if ($versn == null && $coden == null) {
-    echo "<div class=\"left\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
+    echo "<div class=\"left\"><h2>$uptme</span></h2></div>";
 } else {
     if ($coden == null) {
         echo "<div class=\"left\"><h2>$versn</h2></div>";
     } else {
         echo "<div class=\"left\"><h2>$versn [$coden]</h2></div>";
     }
-    echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
+    echo "<div class=\"right\"><h2>$uptme</span></h2></div>";
 }
+
+echo '<br/><br/><br/><br/><br/><br/><br/><br/>';
 
 ?>
 
