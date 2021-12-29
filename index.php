@@ -4,6 +4,9 @@
 <html>
 
 <head>
+    <title>ServerMon</title>
+    <link rel="icon" href="" type="image/x-icon" />
+    <link rel="shortcut icon" href="" type="image/x-icon" />
     <link href="style.css" type="text/css" rel="stylesheet"/>
     <?php
         header("content-type:text/html;charset=utf-8");
