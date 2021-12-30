@@ -10,7 +10,7 @@
     <link href="style.css" type="text/css" rel="stylesheet"/>
     <?php
         header("content-type:text/html;charset=utf-8");
-        header("refresh: 3");
+        header("refresh: 2");
     ?>
 </head>
 
@@ -40,17 +40,15 @@ $uptme = str_replace(array(" hours ", " hour "), "<span class=\"unit\">H</span><
 $uptme = str_replace(array(" minutes", " minute"), "<span class=\"unit\">M</span><span class=\"unit\"></span>", $uptme);
 
 if ($versn == null && $coden == null) {
-    echo "<div class=\"left\"><h2>$uptme</span></h2></div>";
+    echo "<div class=\"left\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
 } else {
     if ($coden == null) {
         echo "<div class=\"left\"><h2>$versn</h2></div>";
     } else {
         echo "<div class=\"left\"><h2>$versn [$coden]</h2></div>";
     }
-    echo "<div class=\"right\"><h2>$uptme</span></h2></div>";
+    echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
 }
-
-echo '<br/><br/><br/><br/><br/><br/><br/><br/>';
 
 ?>
 
@@ -58,7 +56,7 @@ echo '<br/><br/><br/><br/><br/><br/><br/><br/>';
     <?php
 
     $model = shell_exec('cat /proc/cpuinfo | grep \'model name\' | uniq');
-    $model = str_replace(array("\r\n", "\r", "\n", "\t"), "", $model);
+    $model = str_replace(array("\r\n", "\r", "\n", "\t", "(R)", "(TM)"), "", $model);
     $posn1 = strpos($model, ':');
     $model = substr($model, $posn1 + 2);
     $posn2 = strpos($model, '@');
@@ -72,7 +70,11 @@ echo '<br/><br/><br/><br/><br/><br/><br/><br/>';
     $output2 = number_format($number / 1000, 1);
 
     echo "<div class=\"left\">$model</div>";
-    echo "<div class=\"right\">$cores" . "<span class=\"unit\">Cores</span>&emsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
+    if ($output2 == 0) {
+        echo "<div class=\"right\">$cores" . "<span class=\"unit\">Cores</span></div><br/><br/>";
+    } else {
+        echo "<div class=\"right\">$cores" . "<span class=\"unit\">Cores</span>&emsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
+    }
 
     $cpust = shell_exec("cat /proc/stat | grep cpu");
 
