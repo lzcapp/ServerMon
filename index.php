@@ -75,7 +75,7 @@ if ($versn == null && $coden == null) {
     if ($output2 == 0) {
         echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span></div><br/><br/>";
     } else {
-        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&emsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
+        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
     }
 
     $cpust = shell_exec("cat /proc/stat | grep cpu");
@@ -323,7 +323,7 @@ $array = explode(PHP_EOL, $disks);
 
 $count = count($array);
 
-function  filtrfunction($arr){
+function  filter($arr){
     if($arr === '' || $arr === null){
         return false;
     }
@@ -335,7 +335,7 @@ for ($i = 1; $i < $count - 1; $i++) {
     $modul .= "<div class=\"module\">\n";
 
     $arran = explode(" ", $array[$i]);
-    $arran = array_filter($arran, 'filtrfunction');
+    $arran = array_filter($arran, 'filter');
     $arran = array_values($arran);
     $perct = str_replace(array("%"), "", $arran[4]);
 
