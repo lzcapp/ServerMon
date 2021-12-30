@@ -62,6 +62,8 @@ if ($versn == null && $coden == null) {
     $posn2 = strpos($model, '@');
     $model = substr($model, 0, $posn2 - 1);
 
+    $cpusn = shell_exec('cat /proc/cpuinfo | grep "physical id" | sort | uniq -c | wc -l');
+    $cpusn = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cpusn);
     $cores = shell_exec('cat /proc/cpuinfo | grep processor | wc -l');
     $cores = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cores);
     $output2 = shell_exec("paste <(cat /sys/class/thermal/thermal_zone*/type) <(cat /sys/class/thermal/thermal_zone*/temp) | grep x86_pkg_temp");
@@ -71,9 +73,9 @@ if ($versn == null && $coden == null) {
 
     echo "<div class=\"left\">$model</div>";
     if ($output2 == 0) {
-        echo "<div class=\"right\">$cores" . "<span class=\"unit\">Cores</span></div><br/><br/>";
+        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span></div><br/><br/>";
     } else {
-        echo "<div class=\"right\">$cores" . "<span class=\"unit\">Cores</span>&emsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
+        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&emsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
     }
 
     $cpust = shell_exec("cat /proc/stat | grep cpu");
