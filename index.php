@@ -246,14 +246,12 @@ if ($versn == null && $coden == null) {
     ?>
 </div>
 
-<div class="space"></div>
-
 <?php
 
 $model = exec("lspci | grep VGA");
 
 if ($model != null) {
-    echo '<div class="module">';
+    echo '<div class="space"></div>/n<div class="module">';
     
     $model = str_replace(array("\r\n", "\r", "\n", "\t"), "", $model);
     $posn1 = strpos($model, ':');
