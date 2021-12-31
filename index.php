@@ -1,16 +1,16 @@
 <?php session_start(); ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <title>ServerMon</title>
-    <link rel="icon" href="" type="image/x-icon" />
-    <link rel="shortcut icon" href="" type="image/x-icon" />
+    <link rel="icon" href="" type="image/x-icon"/>
+    <link rel="shortcut icon" href="" type="image/x-icon"/>
     <link href="style.css" type="text/css" rel="stylesheet"/>
     <?php
-        header("content-type:text/html;charset=utf-8");
-        header("refresh: 2");
+    header("content-type:text/html;charset=utf-8");
+    header("refresh: 2");
     ?>
 </head>
 
@@ -71,25 +71,42 @@ if ($versn == null && $coden == null) {
     $number = floatval($output2);
     $output2 = number_format($number / 1000, 1);
 
-    echo "<div class=\"left\">$model</div>";
-    if ($output2 == 0) {
-        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span></div><br/><br/>";
-    } else {
-        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
-    }
-
     $cpust = shell_exec("cat /proc/stat | grep cpu");
 
     $array = explode(PHP_EOL, $cpust);
 
     $count = count($array);
 
-    for ($c = 1; $c < count($array) - 1; $c++)
-    {
+    $c0arr = explode(" ", $array[0]);
+    $c0idl = $c0arr[5];
+    $c0tot = $c0arr[2] + $c0arr[3] + $c0arr[4] + $c0arr[5] + $c0arr[6] + $c0arr[7] + $c0arr[8] + $c0arr[9] + $c0arr[10] + $c0arr[11];
+    if (isset($_SESSION['core0'])) {
+        $c0ars = $_SESSION['core0'];
+        $c0ids = $c0ars[5];
+        $c0tos = $c0ars[2] + $c0ars[3] + $c0ars[4] + $c0ars[5] + $c0ars[6] + $c0ars[7] + $c0ars[8] + $c0ars[9] + $c0ars[10] + $c0ars[11];
+    } else {
+        $c0ids = 0;
+        $c0tos = 0;
+    }
+    $_SESSION['core0'] = $c0arr;
+
+    $c0idm = $c0idl - $c0ids;
+    $c0tom = $c0tot - $c0tos;
+
+    $cpuut = number_format(100 * ($c0tom - $c0idm) / $c0tom, 0);
+
+    echo "<div class=\"left\">$model</div>";
+    if ($output2 == 0) {
+        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span></div><br/><br/>";
+    } else {
+        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>&nbsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
+    }
+
+    for ($c = 1; $c < count($array) - 1; $c++) {
         $modul = "<div class=\"space\"></div>";
         $modul .= "<div class=\"module\">\n";
 
-        $arran = explode(" ", $array[$c]);        
+        $arran = explode(" ", $array[$c]);
 
         $usern = $arran[1];
         $systm = $arran[3];
@@ -97,25 +114,21 @@ if ($versn == null && $coden == null) {
         $steal = $arran[8];
         $total = $arran[1] + $arran[2] + $arran[3] + $arran[4] + $arran[5] + $arran[6] + $arran[7] + $arran[8] + $arran[9];
 
-        if(isset($_SESSION['core' . $c]))
-        {
+        if (isset($_SESSION['core' . $c])) {
             $arrse = $_SESSION['core' . $c];
             $users = $usern - $arrse[1];
             $systs = $systm - $arrse[3];
             $iowas = $iowat - $arrse[5];
             $steas = $steal - $arrse[8];
             $totas = $total - $arrse[1] - $arrse[2] - $arrse[3] - $arrse[4] - $arrse[5] - $arrse[6] - $arrse[7] - $arrse[8] - $arrse[9];
-            $_SESSION['core' . $c] = $arran;
-        }
-        else
-        {
+        } else {
             $users = 0;
             $systs = 0;
             $iowas = 0;
             $steas = 0;
             $totas = 1;
-            $_SESSION['core' . $c] = $arran;
         }
+        $_SESSION['core' . $c] = $arran;
 
         $userp = floor(floatval($users) / floatval($totas) * 100);
         $systp = floor(floatval($systs) / floatval($totas) * 100);
@@ -123,28 +136,13 @@ if ($versn == null && $coden == null) {
         $steap = floor(floatval($steas) / floatval($totas) * 100);
 
         $test = floatval($users) / floatval($totas);
-        
+
         $bar = "<div class=\"bar\">\n";
-        for ($i = 0; $i < $userp; $i++)
-        {
-            $bar .= "<i class=\"element usr\"></i>\n";
-        }
-        for ($i = 0; $i < $systp; $i++)
-        {
-            $bar .= "<i class=\"element sys\"></i>\n";
-        }
-        for ($i = 0; $i < $iowap; $i++)
-        {
-            $bar .= "<i class=\"element blu\"></i>\n";
-        }
-        for ($i = 0; $i < $steap; $i++)
-        {
-            $bar .= "<i class=\"element yel\"></i>\n";
-        }
-        for ($i = 0; $i < 100 - $userp - $systp - $iowap - $steap; $i++)
-        {
-            $bar .= "<i class=\"element\"></i>\n";
-        }
+        $bar .= str_repeat("<i class=\"element usr\"></i>\n", $userp);
+        $bar .= str_repeat("<i class=\"element sys\"></i>\n", $systp);
+        $bar .= str_repeat("<i class=\"element blu\"></i>\n", $iowap);
+        $bar .= str_repeat("<i class=\"element yel\"></i>\n", $steap);
+        $bar .= str_repeat("<i class=\"element\"></i>\n", 100 - $userp - $systp - $iowap - $steap);
         $bar .= "</div>\n";
         print $bar;
     }
@@ -161,34 +159,34 @@ if ($versn == null && $coden == null) {
     $posn1 = strpos($free1, ':');
     $free1 = substr($free1, $posn1 + 1);
     $free1 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $free1);
-    $free1 = number_format(floatval($free1) / 1024 /1024, 2);
+    $free1 = number_format(floatval($free1) / 1024 / 1024, 2);
 
     $total = shell_exec('cat /proc/meminfo | grep MemTotal');
     $posn2 = strpos($total, ':');
     $total = substr($total, $posn2 + 1);
     $total = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $total);
-    $total = number_format(floatval($total) / 1024 /1024, 2);
-    
+    $total = number_format(floatval($total) / 1024 / 1024, 2);
+
     $buffs = shell_exec('cat /proc/meminfo | grep Buffers');
     $posn3 = strpos($buffs, ':');
     $buffs = substr($buffs, $posn3 + 1);
     $buffs = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $buffs);
-    $buffs = number_format(floatval($buffs) / 1024 /1024, 2);
-    
+    $buffs = number_format(floatval($buffs) / 1024 / 1024, 2);
+
     $cache = shell_exec('cat /proc/meminfo | grep Cached');
     $posn4 = strpos($cache, ':');
     $cache = substr($cache, $posn4 + 1);
     $cache = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $cache);
-    $cache = number_format(floatval($cache) / 1024 /1024, 2);
-    
+    $cache = number_format(floatval($cache) / 1024 / 1024, 2);
+
     $avail = shell_exec('cat /proc/meminfo | grep MemAvailable');
     $posn5 = strpos($avail, ':');
     $avail = substr($avail, $posn5 + 1);
     $avail = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $avail);
-    $avail = number_format(floatval($avail) / 1024 /1024, 2);
+    $avail = number_format(floatval($avail) / 1024 / 1024, 2);
 
     $used1 = $total - $free1 - $cache - $buffs;
-    
+
     echo "<div class=\"left\"><span class=\"type\">MEM</span></div>";
     echo "<div class=\"right\">$used1" . "<span class=\"slash\">/</span>" . "$total" . "<span class=\"unit\">GB</span></div><br/><br/>";
 
@@ -197,15 +195,9 @@ if ($versn == null && $coden == null) {
     $cachp = floor(floatval($cache) / floatval($total) * 100);
 
     $bar = "<div class=\"bar\">\n";
-    for ($i = 0; $i < $usedp; $i++) {
-        $bar .= "<i class=\"element usr\"></i>\n";
-    }
-    for ($i = 0; $i < $buffp; $i++) {
-        $bar .= "<i class=\"element blu\"></i>\n";
-    }
-    for ($i = 0; $i < $cachp; $i++) {
-        $bar .= "<i class=\"element yel\"></i>\n";
-    }
+    $bar .= str_repeat("<i class=\"element usr\"></i>\n", $usedp);
+    $bar .= str_repeat("<i class=\"element blu\"></i>\n", $buffp);
+    $bar .= str_repeat("<i class=\"element yel\"></i>\n", $cachp);
     for ($i = $usedp + $buffp + $cachp; $i < 100; $i++) {
         $bar .= "<i class=\"element\"></i>\n";
     }
@@ -218,13 +210,13 @@ if ($versn == null && $coden == null) {
     $posn1 = strpos($swap1, ':');
     $swap1 = substr($swap1, $posn1 + 1);
     $swap1 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $swap1);
-    $swap1 = number_format(floatval($swap1) / 1024 /1024, 2);
+    $swap1 = number_format(floatval($swap1) / 1024 / 1024, 2);
 
     $swap2 = shell_exec('cat /proc/meminfo | grep SwapTotal');
     $posn2 = strpos($swap2, ':');
     $swap2 = substr($swap2, $posn2 + 1);
     $swap2 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $swap2);
-    $swap2 = number_format(floatval($swap2) / 1024 /1024, 2);
+    $swap2 = number_format(floatval($swap2) / 1024 / 1024, 2);
 
     $freep = floor(floatval($swap1) / floatval($swap2) * 100);
 
@@ -234,14 +226,8 @@ if ($versn == null && $coden == null) {
     echo "<div class=\"right\">$swap1" . "<span class=\"slash\">/</span>" . "$swap2" . "<span class=\"unit\">GB</span></div><br/><br/>";
 
     $bar = "<div class=\"bar\">\n";
-    for ($i = 0; $i < 100 - $freep; $i++)
-    {
-        $bar .= "<i class=\"element usr\"></i>\n";
-    }
-    for ($i = 0; $i < $freep; $i++)
-    {
-        $bar .= "<i class=\"element\"></i>\n";
-    }
+    $bar .= str_repeat("<i class=\"element usr\"></i>\n", 100 - $freep);
+    $bar .= str_repeat("<i class=\"element\"></i>\n", $freep);
     $bar .= "</div>\n";
     print $bar;
 
@@ -254,7 +240,7 @@ $model = exec("lspci | grep VGA");
 
 if ($model != null) {
     echo '<div class="space"></div><div class="module">';
-    
+
     $model = str_replace(array("\r\n", "\r", "\n", "\t"), "", $model);
     $posn1 = strpos($model, ':');
     $model = substr($model, $posn1 + 1);
@@ -282,14 +268,8 @@ if ($model != null) {
         $mempn = str_replace(array("\r\n", "\r", "\n", "\t", " ", "%"), "", $mempt);
 
         $bar = "<div class=\"bar\">\n";
-        for ($i = 0; $i < $mempn; $i++)
-        {
-            $bar .= "<i class=\"element usr\"></i>\n";
-        }
-        for ($i = 0; $i < 100 - $mempn; $i++)
-        {
-            $bar .= "<i class=\"element\"></i>\n";
-        }
+        $bar .= str_repeat("<i class=\"element usr\"></i>\n", $mempn);
+        $bar .= str_repeat("<i class=\"element\"></i>\n", 100 - $mempn);
         $bar .= "</div>\n";
         print $bar;
 
@@ -298,17 +278,11 @@ if ($model != null) {
         echo "<div class=\"right\">" . "$gpupt" . "<span class=\"unit\">%</span></div><br/><br/>";
 
         $bar = "<div class=\"bar\">\n";
-        for ($i = 0; $i < $gpupt; $i++)
-        {
-            $bar .= "<i class=\"element usr\"></i>\n";
-        }
-        for ($i = 0; $i < 100 - $gpupt; $i++)
-        {
-            $bar .= "<i class=\"element\"></i>\n";
-        }
+        $bar .= str_repeat("<i class=\"element usr\"></i>\n", $gpupt);
+        $bar .= str_repeat("<i class=\"element\"></i>\n", 100 - $gpupt);
         $bar .= "</div>\n";
         print $bar;
-    
+
         echo '</div>';
     }
 }
@@ -323,8 +297,9 @@ $array = explode(PHP_EOL, $disks);
 
 $count = count($array);
 
-function  filter($arr){
-    if($arr === '' || $arr === null){
+function filter($arr)
+{
+    if ($arr === '' || $arr === null) {
         return false;
     }
     return true;
@@ -341,7 +316,7 @@ for ($i = 1; $i < $count - 1; $i++) {
 
     $siztn = substr($arran[1], 0, strlen($arran[1]) - 1);
     $siztu = substr($arran[1], -1);
-    
+
     if ($arran[2] === '0') {
         $sizun = 0;
         $sizuu = $siztu;
@@ -349,23 +324,17 @@ for ($i = 1; $i < $count - 1; $i++) {
         $sizun = substr($arran[2], 0, strlen($arran[2]) - 1);
         $sizuu = substr($arran[2], -1);
     }
-    
+
     $modul .= "<div class=\"left\">$arran[0]</div>\n";
     $modul .= "<div class=\"right\"><span class=\"type\">$arran[5]</span></div><br/><br/>\n";
 
     $modul .= "<div class=\"right\">$sizun<span class=\"unit\">$sizuu</span><span class=\"slash\">/</span>$siztn<span class=\"unit\">$siztu</span></div><br/><br/>";
 
     $modul .= "<div class=\"bar\">\n";
-    for ($j = 0; $j < $perct; $j++)
-    {
-        $modul .= "<i class=\"element usr\"></i>\n";
-    }
-    for ($j = 0; $j < 100 - $perct; $j++)
-    {
-        $modul .= "<i class=\"element\"></i>\n";
-    }
+    $modul .= str_repeat("<i class=\"element usr\"></i>\n", $perct);
+    $modul .= str_repeat("<i class=\"element\"></i>\n", 100 - $perct);
     $modul .= "</div>\n";
-    
+
     $modul .= "</div>\n";
 
     echo $modul;
