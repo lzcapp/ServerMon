@@ -317,7 +317,7 @@ if ($model != null) {
 
 <?php
 
-$disks = shell_exec("df -h -P | grep -wv tmpfs");
+$disks = shell_exec("df -h -P | grep -wv tmpfs | grep -wv devtmpfs");
 
 $array = explode(PHP_EOL, $disks);
 
