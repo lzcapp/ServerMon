@@ -79,7 +79,7 @@ if ($versn == null && $coden == null) {
 
     $c0arr = explode(" ", $array[0]);
     $c0idl = $c0arr[5];
-    $c0tot = $c0arr[2] + $c0arr[3] + $c0arr[4] + $c0arr[5] + $c0arr[6] + $c0arr[7] + $c0arr[8] + $c0arr[9] + $c0arr[10] + $c0arr[11];
+    $c0tot = $c0arr[2] . $c0arr[3] . $c0arr[4] . $c0arr[5] . $c0arr[6] . $c0arr[7] . $c0arr[8] . $c0arr[9] . $c0arr[10] . $c0arr[11];
     if (isset($_SESSION['core0'])) {
         $c0ars = $_SESSION['core0'];
         $c0ids = $c0ars[5];
@@ -93,7 +93,7 @@ if ($versn == null && $coden == null) {
     $c0idm = $c0idl - $c0ids;
     $c0tom = $c0tot - $c0tos;
 
-    $cpuut = number_format(100 * ($c0tom - $c0idm) / $c0tom, 0);
+    $cpuut = number_format(100 * ($c0tom - $c0idm) / $c0tom);
 
     echo "<div class=\"left\">$model</div>";
     if ($output2 == 0) {
@@ -112,7 +112,7 @@ if ($versn == null && $coden == null) {
         $systm = $arran[3];
         $iowat = $arran[5];
         $steal = $arran[8];
-        $total = $arran[1] + $arran[2] + $arran[3] + $arran[4] + $arran[5] + $arran[6] + $arran[7] + $arran[8] + $arran[9];
+        $total = $arran[1] . $arran[2] . $arran[3] . $arran[4] . $arran[5] . $arran[6] . $arran[7] . $arran[8] . $arran[9];
 
         if (isset($_SESSION['core' . $c])) {
             $arrse = $_SESSION['core' . $c];
@@ -236,6 +236,13 @@ if ($versn == null && $coden == null) {
 
 <?php
 
+if (!function_exists('str_contains')) {
+    function str_contains($haystack, $needle): bool
+    {
+        return $needle !== '' && mb_strpos($haystack, $needle) !== false;
+    }
+}
+
 $model = exec("lspci | grep VGA");
 
 if ($model != null) {
@@ -249,7 +256,7 @@ if ($model != null) {
 
     echo "<div class=\"left\">$model</div>";
 
-    if (strpos($model, 'NVIDIA') !== false) {
+    if (str_contains($model, 'NVIDIA')) {
 
         $temp1 = shell_exec('nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader');
         $temp1 = str_replace(array("\r\n", "\r", "\n", "\t"), "", $temp1);
@@ -297,7 +304,7 @@ $array = explode(PHP_EOL, $disks);
 
 $count = count($array);
 
-function filter($arr)
+function filter($arr): bool
 {
     if ($arr === '' || $arr === null) {
         return false;
