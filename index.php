@@ -67,7 +67,7 @@ if ($versn == null && $coden == null) {
     $cores = shell_exec('cat /proc/cpuinfo | grep processor | wc -l');
     $cores = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cores);
     $output2 = shell_exec("paste <(cat /sys/class/thermal/thermal_zone*/type) <(cat /sys/class/thermal/thermal_zone*/temp) | grep x86_pkg_temp");
-    $output2 = str_replace(array("\r\n", "\r", "\n", "\t", "x86_pkg_temp"), "", $output2);
+    $output2 = $output2 ? str_replace(array("\r\n", "\r", "\n", "\t", "x86_pkg_temp"), "", $output2) : "";
     $number = floatval($output2);
     $output2 = number_format($number / 1000, 1);
 
@@ -243,7 +243,7 @@ if (!function_exists('str_contains')) {
     }
 }
 
-$model = exec("lspci | grep VGA");
+$model = shell_exec("lspci | grep VGA");
 
 if ($model != null) {
     echo '<div class="space"></div><div class="module">';
@@ -291,7 +291,10 @@ if ($model != null) {
         print $bar;
 
         echo '</div>';
+    } else {
+        echo '<br/>';
     }
+    echo '</div>';
 }
 
 ?>
