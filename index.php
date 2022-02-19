@@ -79,7 +79,7 @@ if ($versn == null && $coden == null) {
 
     $c0arr = explode(" ", $array[0]);
     $c0idl = $c0arr[5];
-    $c0tot = $c0arr[2] . $c0arr[3] . $c0arr[4] . $c0arr[5] . $c0arr[6] . $c0arr[7] . $c0arr[8] . $c0arr[9] . $c0arr[10] . $c0arr[11];
+    $c0tot = $c0arr[2] + $c0arr[3] + $c0arr[4] + $c0arr[5] + $c0arr[6] + $c0arr[7] + $c0arr[8] + $c0arr[9] + $c0arr[10] + $c0arr[11];
     if (isset($_SESSION['core0'])) {
         $c0ars = $_SESSION['core0'];
         $c0ids = $c0ars[5];
