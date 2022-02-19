@@ -112,7 +112,7 @@ if ($versn == null && $coden == null) {
         $systm = $arran[3];
         $iowat = $arran[5];
         $steal = $arran[8];
-        $total = $arran[1] . $arran[2] . $arran[3] . $arran[4] . $arran[5] . $arran[6] . $arran[7] . $arran[8] . $arran[9];
+        $total = $arran[1] + $arran[2] + $arran[3] + $arran[4] + $arran[5] + $arran[6] + $arran[7] + $arran[8] + $arran[9];
 
         if (isset($_SESSION['core' . $c])) {
             $arrse = $_SESSION['core' . $c];
