@@ -1,7 +1,4 @@
-@font-face {
-    font-family: 'Fira Code';
-    src:url("font/FiraCode-VF.woff2")；
-}
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@500&display=swap');
 
 html {
     background-color: #222;
@@ -47,9 +44,7 @@ h2 {
 .module {
     background-color: #333;
     border-radius: 15px;
-    padding: 1%;
-    padding-top: 2%;
-    padding-bottom: 2%;
+    padding: 2% 1%;
 }
 
 .unit {
@@ -104,15 +99,15 @@ h2 {
 }
 
 @media (orientation: landscape) {
-  .element {
-    width: 1vw;
-    height: 1vh;
-  }
+    .element {
+        width: 1vw;
+        height: 1vh;
+    }
 }
 
 @media (orientation: portrait) {
-  .element {
-    width: 1vw;
-    height: 1vh;
-  }
+    .element {
+        width: 1vw;
+        height: 1vh;
+    }
 }
