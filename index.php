@@ -14,7 +14,7 @@
     ?>
 </head>
 
-<body>
+<body oncontextmenu="return false;" onselectstart="return false" unselectable="on">
 
 <?php
 

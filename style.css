@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
 
 html {
     background-color: #222;
@@ -16,7 +16,7 @@ body {
 pre, div, h1, h2 {
     font-size: 1.2em;
     font-weight: 500;
-    font-family: 'Fira Code', 'Cascadia Code', 'Ubuntu Mono', 'Source Code Pro', monospace !important;
+    font-family: 'Ubuntu Mono', 'Cascadia Code', 'Source Code Pro', monospace !important;
 }
 
 h1 {
