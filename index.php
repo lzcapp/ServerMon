@@ -14,6 +14,7 @@
     ?>
 </head>
 
+<!--suppress HtmlUnknownAttribute -->
 <body oncontextmenu="return false;" onselectstart="return false" unselectable="on">
 
 <?php
