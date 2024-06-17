@@ -19,8 +19,8 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/mobaxterm-genkey
-            ghcr.io/${{ github.actor }}/mobaxterm-genkey
+            ${{ secrets.DOCKERHUB_USERNAME }}/servermon
+            ghcr.io/${{ github.actor }}/servermon
           # generate Docker tags based on the following events/attributes
           tags: |
             type=schedule
@@ -59,6 +59,6 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/mobaxterm-genkey:latest
-            ghcr.io/${{ github.actor }}/mobaxterm-genkey:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/servermon:latest
+            ghcr.io/${{ github.actor }}/servermon:latest
             ${{ steps.meta.outputs.tags }}
