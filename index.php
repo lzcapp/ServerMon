@@ -3,8 +3,6 @@ header("content-type:text/html;charset=utf-8");
 header("refresh: 2");
 ?>
 
-<?php session_start(); ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
