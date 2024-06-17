@@ -8,4 +8,31 @@
 &ensp;
 ![Docker Image Size](https://img.shields.io/docker/image-size/seeleo/servermon?style=for-the-badge)
 
+## Demo
+
+- [mobaxterm.seeleo.com](https://mobaxterm.seeleo.com/)
+
+## Local
+
+**PHP** & **shell__exec** Required
+
+## Docker
+
+### Docker Hub
+
+```
+docker pull seeleo/servermon:latest
+docker run -d -p 5001:80 seeleo/servermon:latest
+```
+
+
+### Container Registry (GitHub)
+
+```
+docker pull ghcr.io/lzcapp/servermon:latest
+docker run -d -p 5001:80 ghcr.io/lzcapp/servermon:latest
+```
+
+## Screenshot
+
 ![Screenshot](https://user-images.githubusercontent.com/12462465/154803703-2f41f8d5-c72d-40fa-85d3-c39cd79a300a.png)
