@@ -1,7 +1,7 @@
 # ServerMon
 
 ![](https://img.shields.io/badge/PHP-shell__exec-lightgrey?style=for-the-badge&logo=php)&ensp;
-![](https://img.shields.io/website?label=servermon.lzc.app&style=for-the-badge&url=https%3A%2F%2Fservermon.lzc.app%2F)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fservermon.seeleo.com%2F&style=for-the-badge&label=servermon.seeleo.com)
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/lzcapp/ServerMon/main.yml?style=for-the-badge)
 &ensp; ![Docker Image Version](https://img.shields.io/docker/v/seeleo/servermon?style=for-the-badge)
@@ -10,7 +10,7 @@
 
 ## Demo
 
-- [mobaxterm.seeleo.com](https://mobaxterm.seeleo.com/)
+- [ServerMon.seeleo.com](https://ServerMon.seeleo.com/)
 
 ## Local
 
