@@ -1,5 +1,10 @@
 <?php session_start(); ?>
 
+<?php
+header("content-type:text/html;charset=utf-8");
+header("refresh: 2");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,10 +13,6 @@
     <link rel="icon" href="" type="image/x-icon"/>
     <link rel="shortcut icon" href="" type="image/x-icon"/>
     <link href="style.css?v=202312092302" type="text/css" rel="stylesheet"/>
-    <?php
-    header("content-type:text/html;charset=utf-8");
-    header("refresh: 2");
-    ?>
 </head>
 
 <!--suppress HtmlUnknownAttribute -->
