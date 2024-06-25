@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:8.2-apache
 
 # 复制应用程序文件到容器中
 COPY . /var/www/html/
