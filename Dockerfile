@@ -1,4 +1,4 @@
-FROM php:7.4-alpine
+FROM php:7.4-apache-buster
 
 # 复制应用程序文件到容器中
 COPY . /var/www/html/
