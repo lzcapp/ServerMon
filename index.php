@@ -26,15 +26,10 @@ echo '</script>';
 $hostn = shell_exec('hostname');
 echo "<h1>$hostn</h1>";
 
-$versn = shell_exec('lsb_release -a | grep Description');
-$versn = str_replace(array("\r\n", "\r", "\n", "\t"), "", $versn);
-$verps = strpos($versn, ':');
-$versn = substr($versn, $verps + 1);
-$coden = shell_exec('lsb_release -a | grep Codename');
-$coden = str_replace(array("\r\n", "\r", "\n", "\t"), "", $coden);
-$codep = strpos($coden, ':');
-$coden = substr($coden, $codep + 1);
-$versn = str_replace(array(" (" . $coden . ")"), "", $versn);
+$verar = shell_exec('cat /etc/os-release');
+$versn = explode(PHP_EOL, $verar)[0];
+$verps = str_replace('PRETTY_NAME="', "", $versn);
+$verps = str_replace('"', "", $verps);
 
 $uptme = shell_exec('uptime -p');
 $uptme = str_replace(array("\r\n", "\r", "\n", "\t", ","), "", $uptme);
@@ -44,14 +39,10 @@ $uptme = str_replace(array(" days ", " day "), "<span class=\"unit\">D</span><sp
 $uptme = str_replace(array(" hours ", " hour "), "<span class=\"unit\">H</span><span class=\"unit\"></span>", $uptme);
 $uptme = str_replace(array(" minutes", " minute"), "<span class=\"unit\">M</span><span class=\"unit\"></span>", $uptme);
 
-if ($versn == null && $coden == null) {
+if ($verps == null or $verps == "") {
     echo "<div class=\"left\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
 } else {
-    if ($coden == null) {
-        echo "<div class=\"left\"><h2>$versn</h2></div>";
-    } else {
-        echo "<div class=\"left\"><h2>$versn [$coden]</h2></div>";
-    }
+    echo "<div class=\"left\"><h2>$verps</h2></div>";
     echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
 }
 
