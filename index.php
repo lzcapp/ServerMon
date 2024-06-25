@@ -82,15 +82,16 @@ if ($versn == null && $coden == null) {
     $c0arr = explode(" ", $array[0]);
     $c0idl = $c0arr[5];
     $c0tot = $c0arr[2] + $c0arr[3] + $c0arr[4] + $c0arr[5] + $c0arr[6] + $c0arr[7] + $c0arr[8] + $c0arr[9] + $c0arr[10] + $c0arr[11];
-    if (isset($_SESSION['core0'])) {
-        $c0ars = $_SESSION['core0'];
+    if (isset($_COOKIE['core0']) && !empty($_COOKIE['core0'])) {
+        $c0ars = unserialize($_COOKIE['core0']);
         $c0ids = $c0ars[5];
         $c0tos = $c0ars[2] + $c0ars[3] + $c0ars[4] + $c0ars[5] + $c0ars[6] + $c0ars[7] + $c0ars[8] + $c0ars[9] + $c0ars[10] + $c0ars[11];
     } else {
         $c0ids = 0;
         $c0tos = 0;
     }
-    $_SESSION['core0'] = $c0arr;
+
+    setcookie('core0', serialize($c0arr), time() + 3600);
 
     $c0idm = $c0idl - $c0ids;
     $c0tom = $c0tot - $c0tos;
@@ -114,15 +115,15 @@ if ($versn == null && $coden == null) {
         $systm = $arran[3];
         $iowat = $arran[5];
         $steal = $arran[8];
-        $total = $arran[1] + $arran[2] + $arran[3] + $arran[4] + $arran[5] + $arran[6] + $arran[7] + $arran[8] + $arran[9];
+        $total = $arran[1] + $arran[2] + $arran[3] + $arran[4] + $arran[5] + $arran[6] + $arran[7] + $arran[8] + $arran[9] + $arran[10];
 
-        if (isset($_SESSION['core' . $c])) {
-            $arrse = $_SESSION['core' . $c];
+        if (isset($_COOKIE['core' . $c])) {
+            $arrse = unserialize($_COOKIE['core' . $c]);
             $users = $usern - $arrse[1];
             $systs = $systm - $arrse[3];
             $iowas = $iowat - $arrse[5];
             $steas = $steal - $arrse[8];
-            $totas = $total - $arrse[1] - $arrse[2] - $arrse[3] - $arrse[4] - $arrse[5] - $arrse[6] - $arrse[7] - $arrse[8] - $arrse[9];
+            $totas = $total - $arrse[1] - $arrse[2] - $arrse[3] - $arrse[4] - $arrse[5] - $arrse[6] - $arrse[7] - $arrse[8] - $arrse[9] - $arrse[10];
         } else {
             $users = 0;
             $systs = 0;
@@ -130,7 +131,8 @@ if ($versn == null && $coden == null) {
             $steas = 0;
             $totas = 1;
         }
-        $_SESSION['core' . $c] = $arran;
+
+        setcookie('core' . $c, serialize($arran), time() + 3600);
 
         $userp = floor(floatval($users) / floatval($totas) * 100);
         $systp = floor(floatval($systs) / floatval($totas) * 100);
@@ -199,7 +201,7 @@ if ($versn == null && $coden == null) {
     $bar = "<div class=\"bar\">\n";
     $bar .= str_repeat("<i class=\"element usr\"></i>\n", $usedp);
     $bar .= str_repeat("<i class=\"element blu\"></i>\n", $buffp);
-    $bar .= str_repeat("<i class=\"element yel\"></i>\n", $cachp);
+    $bar .= str_repeat("<i class=\"element gry\"></i>\n", $cachp);
     for ($i = $usedp + $buffp + $cachp; $i < 100; $i++) {
         $bar .= "<i class=\"element\"></i>\n";
     }
