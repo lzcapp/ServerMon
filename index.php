@@ -87,7 +87,7 @@ if ($verps == null or $verps == "") {
         $c0tos = 0;
     }
 
-    setcookie('core0', serialize($c0arr), time() + 3600);
+    setcookie('core0', serialize($c0arr), time() + 60);
 
     $c0idm = $c0idl - $c0ids;
     $c0tom = $c0tot - $c0tos;
@@ -128,7 +128,7 @@ if ($verps == null or $verps == "") {
             $totas = 1;
         }
 
-        setcookie('core' . $c, serialize($arran), time() + 3600);
+        setcookie('core' . $c, serialize($arran), time() + 60);
 
         $userp = floor(floatval($users) / floatval($totas) * 100);
         $systp = floor(floatval($systs) / floatval($totas) * 100);
