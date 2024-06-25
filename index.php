@@ -60,7 +60,9 @@ if ($versn == null && $coden == null) {
     $posn1 = strpos($model, ':');
     $model = substr($model, $posn1 + 2);
     $posn2 = strpos($model, '@');
-    $model = substr($model, 0, $posn2 - 1);
+    if ($posn2 !== false) {
+        $model = substr($model, 0, $posn2 - 1);
+    }
 
     $cpusn = shell_exec('cat /proc/cpuinfo | grep "physical id" | sort | uniq -c | wc -l');
     $cpusn = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cpusn);
