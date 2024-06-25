@@ -1,8 +1,3 @@
-<?php
-header("content-type:text/html;charset=utf-8");
-header("refresh: 2");
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,6 +10,12 @@ header("refresh: 2");
 
 <!--suppress HtmlUnknownAttribute -->
 <body oncontextmenu="return false;" onselectstart="return false" unselectable="on">
+
+<?php
+echo '<script>';
+echo 'setTimeout(function(){location.reload();}, 1000);'; // Refresh the page after 5 seconds
+echo '</script>';
+?>
 
 <?php
 
