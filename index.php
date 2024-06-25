@@ -1,3 +1,7 @@
+<?php
+ob_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -358,5 +362,8 @@ for ($i = 1; $i < $count - 1; $i++) {
 ?>
 
 </body>
-
 </html>
+
+<?php
+ob_end_flush();
+?>
