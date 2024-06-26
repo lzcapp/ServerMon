@@ -14,7 +14,7 @@
 
 ## Local
 
-**PHP** & **shell__exec** Required
+**PHP** & **shell__exec()** Required
 
 ## Docker
 
