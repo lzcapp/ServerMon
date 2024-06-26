@@ -87,7 +87,7 @@ ob_start();
         $c0arr = explode(" ", $array[0]);
         $c0idl = $c0arr[5];
         $c0tot = $c0arr[2] + $c0arr[3] + $c0arr[4] + $c0arr[5] + $c0arr[6] + $c0arr[7] + $c0arr[8] + $c0arr[9] + $c0arr[10] + $c0arr[11];
-        if (isset($_COOKIE['core0']) && !empty($_COOKIE['core0'])) {
+        if (!empty($_COOKIE['core0'])) {
             $c0ars = unserialize($_COOKIE['core0']);
             $c0ids = $c0ars[5];
             $c0tos = $c0ars[2] + $c0ars[3] + $c0ars[4] + $c0ars[5] + $c0ars[6] + $c0ars[7] + $c0ars[8] + $c0ars[9] + $c0ars[10] + $c0ars[11];
