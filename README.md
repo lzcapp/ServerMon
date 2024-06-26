@@ -25,7 +25,6 @@ docker pull seeleo/servermon:latest
 docker run -d -p 5001:80 seeleo/servermon:latest
 ```
 
-
 ### Container Registry (GitHub)
 
 ```
