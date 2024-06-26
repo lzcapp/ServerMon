@@ -103,11 +103,15 @@ ob_start();
 
         $cpuut = number_format(100 * ($c0tom - $c0idm) / $c0tom);
 
+        $cpuld = explode(" ", shell_exec('cat /proc/loadavg'));
+
         echo "<div class=\"left\">$model</div>";
+        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>";
+        echo "<span> (</span>$cpuld[0]" . "&nbsp;$cpuld[1]" . "&nbsp;$cpuld[2]" . "<span>) </span>";
         if ($output2 == 0) {
-            echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span></div><br/><br/>";
+            echo "</div><br/><br/>";
         } else {
-            echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>&nbsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
+            echo "&nbsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
         }
 
         for ($c = 1; $c < count($array) - 1; $c++) {
