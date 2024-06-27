@@ -69,6 +69,8 @@ ob_start();
             $model = substr($model, 0, $posn2 - 1);
         }
 
+        $archn = trim(shell_exec('arch'));
+
         $cpusn = shell_exec('cat /proc/cpuinfo | grep "physical id" | sort | uniq -c | wc -l');
         $cpusn = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cpusn);
         $cores = shell_exec('cat /proc/cpuinfo | grep processor | wc -l');
@@ -105,7 +107,12 @@ ob_start();
 
         $cpuld = explode(" ", shell_exec('cat /proc/loadavg'));
 
-        echo "<div class=\"left\">$model</div>";
+        echo "<div class=\"left\">$model";
+        if ($archn == null or $archn == "") {
+            echo "</div>";
+        } else {
+            echo "<span> (</span>$archn<span>)</span></div>";
+        }
         echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>";
         echo "<span> (</span>$cpuld[0]" . "&nbsp;$cpuld[1]" . "&nbsp;$cpuld[2]" . "<span>) </span>";
         if ($output2 == 0) {
