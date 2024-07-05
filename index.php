@@ -60,7 +60,7 @@ ob_start();
     <div class="module">
         <?php
 
-        $model = shell_exec('cat /proc/cpuinfo | grep \'model name\' | uniq');
+        $model = shell_exec('lscpu | grep \'Model name\' | cut -f 2 -d ":" | awk \'{$1=$1}1\'');
         $model = str_replace(array("\r\n", "\r", "\n", "\t", "(R)", "(TM)"), "", $model);
         $posn1 = strpos($model, ':');
         $model = substr($model, $posn1 + 2);
