@@ -238,7 +238,7 @@ ob_start();
         $swap2 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $swap2);
         $swap2 = number_format(floatval($swap2) / 1024 / 1024, 2);
 
-        $freep = floor(floatval($swap1) / floatval($swap2) * 100);
+        $freep = (int)floor(floatval($swap1) / floatval($swap2) * 100);
 
         $swap1 = $swap2 - $swap1;
 
