@@ -62,12 +62,6 @@ ob_start();
 
         $model = shell_exec('lscpu | grep \'Model name\' | cut -f 2 -d ":" | awk \'{$1=$1}1\'');
         $model = str_replace(array("\r\n", "\r", "\n", "\t", "(R)", "(TM)"), "", $model);
-        $posn1 = strpos($model, ':');
-        $model = substr($model, $posn1 + 2);
-        $posn2 = strpos($model, '@');
-        if ($posn2 !== false) {
-            $model = substr($model, 0, $posn2 - 1);
-        }
 
         $archn = trim(shell_exec('arch'));
 
