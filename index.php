@@ -108,7 +108,7 @@ ob_start();
             echo "<span> (</span>$archn<span>)</span></div>";
         }
         echo "<div class=\"right\">";
-        if ($cpusn == 0) {
+        if ($cpusn != 0) {
             echo "$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;";
         }
         echo "$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>";
