@@ -69,8 +69,8 @@ ob_start();
         $cpusn = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cpusn);
         $cores = shell_exec('cat /proc/cpuinfo | grep processor | wc -l');
         $cores = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cores);
-        $output2 = shell_exec("paste <(cat /sys/class/thermal/thermal_zone*/type) <(cat /sys/class/thermal/thermal_zone*/temp) | grep x86_pkg_temp");
-        $output2 = $output2 ? str_replace(array("\r\n", "\r", "\n", "\t", "x86_pkg_temp"), "", $output2) : "";
+        $output2 = shell_exec("cat /sys/class/thermal/thermal_zone*/temp");
+        $output2 = $output2 ? str_replace(array("\r\n", "\r", "\n", "\t"), "", $output2) : "";
         $number = floatval($output2);
         $output2 = number_format($number / 1000, 1);
 
