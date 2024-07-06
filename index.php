@@ -107,7 +107,11 @@ ob_start();
         } else {
             echo "<span> (</span>$archn<span>)</span></div>";
         }
-        echo "<div class=\"right\">$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>";
+        echo "<div class=\"right\">";
+        if ($cpusn == 0) {
+            echo "$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;";
+        }
+        echo "$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>";
         echo "<span> (</span>$cpuld[0]" . "&nbsp;$cpuld[1]" . "&nbsp;$cpuld[2]" . "<span>) </span>";
         if ($output2 == 0) {
             echo "</div><br/><br/>";
