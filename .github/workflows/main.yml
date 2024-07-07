@@ -50,7 +50,7 @@ jobs:
           push: true
           context: .
           file: ./Dockerfile
-          platforms: linux/386,linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/386,linux/amd64,linux/arm64,linux/arm64/v8,linux/arm/v7
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/servermon:latest
             ghcr.io/${{ github.actor }}/servermon:latest
