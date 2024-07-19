@@ -21,14 +21,14 @@
 ### Docker Hub
 
 ```
-docker pull seeleo/servermon:latest
+sudo docker pull seeleo/servermon:latest
 sudo docker run --name servermon -d -p 5001:80 --restart=always seeleo/servermon:latest
 ```
 
 ### Container Registry (GitHub)
 
 ```
-docker pull ghcr.io/lzcapp/servermon:latest
+sudo docker pull ghcr.io/lzcapp/servermon:latest
 sudo docker run --name servermon -d -p 5001:80 --restart=always ghcr.io/lzcapp/servermon:latest
 ```
 
