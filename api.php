@@ -94,10 +94,13 @@ function getCpuInfo(): array {
     
     if ($IS_LINUX) {
         // CPU型号
-        $model = clean(shell_exec("grep -i 'model name' /proc/cpuinfo 2>/dev/null | head -1 | sed 's/^Model name:\\s*//'") ?: '');
+        $cpuInfo = shell_exec("grep -i 'model name' /proc/cpuinfo 2>/dev/null | head -1") ?: '';
+        $model = trim(str_ireplace('Model name:', '', $cpuInfo));
         if (!$model) {
-            $model = clean(shell_exec("grep -i 'Hardware' /proc/cpuinfo 2>/dev/null | head -1 | sed 's/^Hardware:\\s*//'") ?: 'Unknown');
+            $hardwareInfo = shell_exec("grep -i 'Hardware' /proc/cpuinfo 2>/dev/null | head -1") ?: '';
+            $model = trim(str_ireplace('Hardware:', '', $hardwareInfo)) ?: 'Unknown';
         }
+        $model = clean($model);
         
         // 核心数
         $physicalCpus = (int) clean(shell_exec('cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l'));
