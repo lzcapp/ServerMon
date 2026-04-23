@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServerMon - 服务器监控</title>
+    <title>ServerMon</title>
     
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=1719392798">
@@ -38,21 +38,22 @@
             
             <div class="header-controls">
                 <div class="refresh-interval">
-                    <span class="label">刷新:</span>
+                    <span class="label">Refresh:</span>
+                    <button class="interval-btn" data-interval="1">1s</button>
                     <button class="interval-btn" data-interval="3">3s</button>
                     <button class="interval-btn" data-interval="5">5s</button>
                     <button class="interval-btn" data-interval="10">10s</button>
                     <button class="interval-btn" data-interval="30">30s</button>
                 </div>
                 
-                <button id="refreshBtn" class="icon-btn" title="立即刷新">
+                <button id="refreshBtn" class="icon-btn" title="Refresh Now">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M23 4v6h-6M1 20v-6h6"/>
                         <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
                     </svg>
                 </button>
                 
-                <button id="themeToggle" class="icon-btn" title="切换主题">
+                <button id="themeToggle" class="icon-btn" title="Toggle Theme">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="5"/>
                         <line x1="12" y1="1" x2="12" y2="3"/>
@@ -70,15 +71,15 @@
         
         <div class="header-meta">
             <span class="meta-item">
-                <span class="meta-label">运行时间:</span>
+                <span class="meta-label">Uptime:</span>
                 <span id="uptime">-</span>
             </span>
             <span class="meta-item">
-                <span class="meta-label">架构:</span>
+                <span class="meta-label">Architecture:</span>
                 <span id="arch">-</span>
             </span>
             <span class="meta-item">
-                <span class="meta-label">更新时间:</span>
+                <span class="meta-label">Update Time:</span>
                 <span id="updateTime">-</span>
             </span>
         </div>
@@ -113,7 +114,7 @@
                     </div>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">温度</span>
+                    <span class="stat-label">Temperature</span>
                     <span id="cpuTemp" class="stat-value">-</span>
                 </div>
             </div>
@@ -127,7 +128,7 @@
                         <path d="M6 19v-14a2 2 0 012-2h8a2 2 0 012 2v14a2 2 0 01-2 2H8a2 2 0 01-2-2z"/>
                         <line x1="6" y1="9" x2="18" y2="9"/>
                     </svg>
-                    内存
+                    MEM
                 </h2>
             </div>
             <div class="card-body">
@@ -183,15 +184,15 @@
             <div class="card-body">
                 <div class="gpu-grid">
                     <div class="gpu-stat">
-                        <span class="stat-label">温度</span>
+                        <span class="stat-label">Temperature</span>
                         <span id="gpuTemp" class="stat-value">-</span>
                     </div>
                     <div class="gpu-stat">
-                        <span class="stat-label">显存</span>
+                        <span class="stat-label">VRAM</span>
                         <span id="gpuMem" class="stat-value">-</span>
                     </div>
                     <div class="gpu-stat">
-                        <span class="stat-label">使用率</span>
+                        <span class="stat-label">Usage</span>
                         <span id="gpuUsage" class="stat-value">-</span>
                     </div>
                 </div>
@@ -199,7 +200,7 @@
                     <div id="gpuBar" class="bar-fill"></div>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">显存使用</span>
+                    <span class="stat-label">VRAM Usage</span>
                     <div class="usage-bar small">
                         <div id="gpuMemBar" class="bar-fill"></div>
                     </div>
@@ -216,7 +217,7 @@
                         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
                         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
                     </svg>
-                    磁盘
+                    DISK
                 </h2>
                 <span id="diskMount" class="disk-mount">/</span>
             </div>

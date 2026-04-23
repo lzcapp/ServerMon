@@ -94,9 +94,9 @@ function getCpuInfo(): array {
     
     if ($IS_LINUX) {
         // CPU型号
-        $model = clean(shell_exec("grep -i 'model name' /proc/cpuinfo 2>/dev/null | head -1 | sed 's/Model name://'") ?: '');
+        $model = clean(shell_exec("grep -i 'model name' /proc/cpuinfo 2>/dev/null | head -1 | sed 's/^Model name:\\s*//'") ?: '');
         if (!$model) {
-            $model = clean(shell_exec("grep -i 'Hardware' /proc/cpuinfo 2>/dev/null | head -1 | sed 's/Hardware://'") ?: 'Unknown');
+            $model = clean(shell_exec("grep -i 'Hardware' /proc/cpuinfo 2>/dev/null | head -1 | sed 's/^Hardware:\\s*//'") ?: 'Unknown');
         }
         
         // 核心数
