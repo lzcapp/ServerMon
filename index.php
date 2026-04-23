@@ -1,382 +1,284 @@
 <?php
-ob_start();
+/**
+ * ServerMon - 服务器监控页面
+ * 使用 AJAX 无刷新获取数据
+ */
 ?>
-
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <title>ServerMon</title>
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=1719392798">
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png?v=1719392798">
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png?v=1719392798">
-        <link rel="manifest" href="/icons/site.webmanifest?v=1719392798">
-        <link rel="mask-icon" href="/icons/safari-pinned-tab.svg?v=1719392798" color="#5bbad5">
-        <link rel="shortcut icon" href="/icons/favicon.ico?v=1719392798">
-        <meta name="apple-mobile-web-app-title" content="ServerMon">
-        <meta name="application-name" content="ServerMon">
-        <meta name="msapplication-TileColor" content="#000000">
-        <meta name="msapplication-config" content="/icons/browserconfig.xml?v=1719392798">
-        <meta name="theme-color" content="#ffffff">
-        <link href="style.css?v=1719392798" type="text/css" rel="stylesheet"/>
-    </head>
-
-    <!--suppress HtmlUnknownAttribute -->
-    <body oncontextmenu="return false;" onselectstart="return false" unselectable="on">
-
-    <?php
-    echo '<script>';
-    echo 'setTimeout(function(){location.reload();}, 1000);'; // Refresh the page after 5 seconds
-    echo '</script>';
-    ?>
-
-    <?php
-
-    $hostn = shell_exec('hostname');
-    echo "<h1>$hostn</h1>";
-
-    $verar = shell_exec('cat /etc/os-release');
-    $versn = explode(PHP_EOL, $verar)[0];
-    $verps = str_replace('PRETTY_NAME="', "", $versn);
-    $verps = str_replace('"', "", $verps);
-
-    $uptme = shell_exec('uptime -p');
-    $uptme = str_replace(array("\r\n", "\r", "\n", "\t", ","), "", $uptme);
-    $uptme = str_replace(array("up"), "<span class=\"type\">UP</span>", $uptme);
-    $uptme = str_replace(array(" weeks ", " week "), "<span class=\"unit\">W</span><span class=\"unit\"></span>", $uptme);
-    $uptme = str_replace(array(" days ", " day "), "<span class=\"unit\">D</span><span class=\"unit\"></span>", $uptme);
-    $uptme = str_replace(array(" hours ", " hour "), "<span class=\"unit\">H</span><span class=\"unit\"></span>", $uptme);
-    $uptme = str_replace(array(" minutes", " minute"), "<span class=\"unit\">M</span><span class=\"unit\"></span>", $uptme);
-
-    if ($verps == null or $verps == "") {
-        echo "<div class=\"left\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
-    } else {
-        echo "<div class=\"left\"><h2>$verps</h2></div>";
-        echo "<div class=\"right\"><h2>$uptme</span></h2></div><br/><br/><br/><br/><br/>";
-    }
-
-    ?>
-
-    <div class="module">
-        <?php
-
-        $model = shell_exec('lscpu | grep \'Model name\' | cut -f 2 -d ":" | awk \'{$1=$1}1\'');
-        $model = str_replace(array("\r\n", "\r", "\n", "\t", "(R)", "(TM)"), "", $model);
-
-        $archn = trim(shell_exec('arch'));
-
-        $cpusn = shell_exec('cat /proc/cpuinfo | grep "physical id" | sort | uniq -c | wc -l');
-        $cpusn = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cpusn);
-        $cores = shell_exec('cat /proc/cpuinfo | grep processor | wc -l');
-        $cores = str_replace(array("\r\n", "\r", "\n", "\t"), "", $cores);
-        $output2 = shell_exec("cat /sys/class/thermal/thermal_zone*/temp");
-        $output2 = $output2 ? str_replace(array("\r\n", "\r", "\n", "\t"), "", $output2) : "";
-        $number = floatval($output2);
-        $output2 = number_format($number / 1000, 1);
-
-        $cpust = shell_exec("cat /proc/stat | grep cpu");
-
-        $array = explode(PHP_EOL, $cpust);
-
-        $count = count($array);
-
-        $c0arr = explode(" ", $array[0]);
-        $c0idl = $c0arr[5];
-        $c0tot = $c0arr[2] + $c0arr[3] + $c0arr[4] + $c0arr[5] + $c0arr[6] + $c0arr[7] + $c0arr[8] + $c0arr[9] + $c0arr[10] + $c0arr[11];
-        if (!empty($_COOKIE['core0'])) {
-            $c0ars = unserialize($_COOKIE['core0']);
-            $c0ids = $c0ars[5];
-            $c0tos = $c0ars[2] + $c0ars[3] + $c0ars[4] + $c0ars[5] + $c0ars[6] + $c0ars[7] + $c0ars[8] + $c0ars[9] + $c0ars[10] + $c0ars[11];
-        } else {
-            $c0ids = 0;
-            $c0tos = 0;
-        }
-
-        setcookie('core0', serialize($c0arr), time() + 3600);
-
-        $c0idm = $c0idl - $c0ids;
-        $c0tom = $c0tot - $c0tos;
-
-        $cpuut = number_format(100 * ($c0tom - $c0idm) / $c0tom);
-
-        $cpuld = explode(" ", shell_exec('cat /proc/loadavg'));
-
-        echo "<div class=\"left\">$model";
-        if ($archn == null or $archn == "") {
-            echo "</div>";
-        } else {
-            echo "<span> (</span>$archn<span>)</span></div>";
-        }
-        echo "<div class=\"right\">";
-        if ($cpusn != 0) {
-            echo "$cpusn" . "<span class=\"unit\">CPU</span>&nbsp;";
-        }
-        echo "$cores" . "<span class=\"unit\">Cores</span>&nbsp;$cpuut<span class=\"unit\">%</span>";
-        echo "<span> (</span>$cpuld[0]" . "&nbsp;$cpuld[1]" . "&nbsp;$cpuld[2]" . "<span>)</span>";
-        if ($output2 == 0) {
-            echo "</div><br/><br/>";
-        } else {
-            echo "&nbsp;" . "$output2" . "<span class=\"unit\">°C</span></div><br/><br/>";
-        }
-
-        for ($c = 1; $c < count($array) - 1; $c++) {
-            $modul = "<div class=\"space\"></div>";
-            $modul .= "<div class=\"module\">\n";
-
-            $arran = explode(" ", $array[$c]);
-
-            $usern = $arran[1];
-            $systm = $arran[3];
-            $iowat = $arran[5];
-            $steal = $arran[8];
-            $total = $arran[1] + $arran[2] + $arran[3] + $arran[4] + $arran[5] + $arran[6] + $arran[7] + $arran[8] + $arran[9] + $arran[10];
-
-            if (isset($_COOKIE['core' . $c])) {
-                $arrse = unserialize($_COOKIE['core' . $c]);
-                $users = $usern - $arrse[1];
-                $systs = $systm - $arrse[3];
-                $iowas = $iowat - $arrse[5];
-                $steas = $steal - $arrse[8];
-                $totas = $total - $arrse[1] - $arrse[2] - $arrse[3] - $arrse[4] - $arrse[5] - $arrse[6] - $arrse[7] - $arrse[8] - $arrse[9] - $arrse[10];
-            } else {
-                $users = 0;
-                $systs = 0;
-                $iowas = 0;
-                $steas = 0;
-                $totas = 1;
-            }
-
-            setcookie('core' . $c, serialize($arran), time() + 3600);
-
-            $userp = floor(floatval($users) / floatval($totas) * 100);
-            $systp = floor(floatval($systs) / floatval($totas) * 100);
-            $iowap = floor(floatval($iowas) / floatval($totas) * 100);
-            $steap = floor(floatval($steas) / floatval($totas) * 100);
-
-            $test = floatval($users) / floatval($totas);
-
-            $bar = "<div class=\"bar\">\n";
-            $bar .= str_repeat("<i class=\"element usr\"></i>\n", $userp);
-            $bar .= str_repeat("<i class=\"element sys\"></i>\n", $systp);
-            $bar .= str_repeat("<i class=\"element blu\"></i>\n", $iowap);
-            $bar .= str_repeat("<i class=\"element yel\"></i>\n", $steap);
-            $bar .= str_repeat("<i class=\"element\"></i>\n", 100 - $userp - $systp - $iowap - $steap);
-            $bar .= "</div>\n";
-            print $bar;
-        }
-
-        ?>
-    </div>
-
-    <div class="space"></div>
-
-    <div class="module">
-        <?php
-
-        $free1 = shell_exec('cat /proc/meminfo | grep MemFree');
-        $posn1 = strpos($free1, ':');
-        $free1 = substr($free1, $posn1 + 1);
-        $free1 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $free1);
-        $free1 = number_format(floatval($free1) / 1024 / 1024, 2);
-
-        $total = shell_exec('cat /proc/meminfo | grep MemTotal');
-        $posn2 = strpos($total, ':');
-        $total = substr($total, $posn2 + 1);
-        $total = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $total);
-        $total = number_format(floatval($total) / 1024 / 1024, 2);
-
-        $buffs = shell_exec('cat /proc/meminfo | grep Buffers');
-        $posn3 = strpos($buffs, ':');
-        $buffs = substr($buffs, $posn3 + 1);
-        $buffs = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $buffs);
-        $buffs = number_format(floatval($buffs) / 1024 / 1024, 2);
-
-        $cache = shell_exec('cat /proc/meminfo | grep Cached');
-        $posn4 = strpos($cache, ':');
-        $cache = substr($cache, $posn4 + 1);
-        $cache = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $cache);
-        $cache = number_format(floatval($cache) / 1024 / 1024, 2);
-
-        $avail = shell_exec('cat /proc/meminfo | grep MemAvailable');
-        $posn5 = strpos($avail, ':');
-        $avail = substr($avail, $posn5 + 1);
-        $avail = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $avail);
-        $avail = number_format(floatval($avail) / 1024 / 1024, 2);
-
-        $used1 = $total - $free1 - $cache - $buffs;
-
-        echo "<div class=\"left\"><span class=\"type\">MEM</span></div>";
-        echo "<div class=\"right\">$used1" . "<span class=\"slash\">/</span>" . "$total" . "<span class=\"unit\">GB</span></div><br/><br/>";
-
-        $usedp = floor(floatval($used1) / floatval($total) * 100);
-        $buffp = floor(floatval($buffs) / floatval($total) * 100);
-        $cachp = floor(floatval($cache) / floatval($total) * 100);
-
-        $bar = "<div class=\"bar\">\n";
-        $bar .= str_repeat("<i class=\"element usr\"></i>\n", $usedp);
-        $bar .= str_repeat("<i class=\"element blu\"></i>\n", $buffp);
-        $bar .= str_repeat("<i class=\"element gry\"></i>\n", $cachp);
-        for ($i = $usedp + $buffp + $cachp; $i < 100; $i++) {
-            $bar .= "<i class=\"element\"></i>\n";
-        }
-        $bar .= "</div>\n";
-        print $bar;
-
-        echo "<div class=\"space\"></div>";
-
-        $swap1 = shell_exec('cat /proc/meminfo | grep SwapFree');
-        $posn1 = strpos($swap1, ':');
-        $swap1 = substr($swap1, $posn1 + 1);
-        $swap1 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $swap1);
-        $swap1 = number_format(floatval($swap1) / 1024 / 1024, 2);
-
-        $swap2 = shell_exec('cat /proc/meminfo | grep SwapTotal');
-        $posn2 = strpos($swap2, ':');
-        $swap2 = substr($swap2, $posn2 + 1);
-        $swap2 = str_replace(array("\r\n", "\r", "\n", "\t", " ", "kB"), "", $swap2);
-        $swap2 = number_format(floatval($swap2) / 1024 / 1024, 2);
-
-        if (floatval($swap2) == 0) {
-            $freep = 100;
-        } else {
-            $freep = floor(floatval($swap1) / floatval($swap2) * 100);
-        }
-
-        $swap1 = $swap2 - $swap1;
-
-        echo "<div class=\"left\"><span class=\"type\">SWAP</span></div>";
-        echo "<div class=\"right\">$swap1" . "<span class=\"slash\">/</span>" . "$swap2" . "<span class=\"unit\">GB</span></div><br/><br/>";
-
-        $bar = "<div class=\"bar\">\n";
-        $bar .= str_repeat("<i class=\"element usr\"></i>\n", 100 - $freep);
-        $bar .= str_repeat("<i class=\"element\"></i>\n", $freep);
-        $bar .= "</div>\n";
-        print $bar;
-
-        ?>
-    </div>
-
-    <?php
-
-    if (!function_exists('str_contains')) {
-        function str_contains($haystack, $needle): bool
-        {
-            return $needle !== '' && mb_strpos($haystack, $needle) !== false;
-        }
-    }
-
-    $model = shell_exec("lspci | grep VGA");
-
-    if ($model != null) {
-        echo '<div class="space"></div><div class="module">';
-
-        $model = str_replace(array("\r\n", "\r", "\n", "\t"), "", $model);
-        $posn1 = strpos($model, ':');
-        $model = substr($model, $posn1 + 1);
-        $posn2 = strpos($model, ':');
-        $model = substr($model, $posn2 + 2);
-
-        echo "<div class=\"left\">$model</div>";
-
-        if (str_contains($model, 'NVIDIA')) {
-
-            $temp1 = shell_exec('nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader');
-            $temp1 = str_replace(array("\r\n", "\r", "\n", "\t"), "", $temp1);
-            $used1 = shell_exec('nvidia-smi --query-gpu=memory.used --format=csv,noheader');
-            $used1 = str_replace(array("\r\n", "\r", "\n", " ", "MiB"), "", $used1);
-            $total = shell_exec('nvidia-smi --query-gpu=memory.total --format=csv,noheader');
-            $total = str_replace(array("\r\n", "\r", "\n", " ", "MiB"), "", $total);
-            echo "<div class=\"right\">$temp1" . "<span class=\"unit\">°C</span></div><br/><br/>";
-
-            echo "<div class=\"left\"><span class=\"type\">MEM</span></div>";
-            echo "<div class=\"right\">$used1" . "<span class=\"slash\">/</span>" . "$total" . "<span class=\"unit\">MB</span></div><br/><br/>";
-
-            $gpupt = shell_exec('nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader');
-            $gpupt = str_replace(array("\r\n", "\r", "\n", "\t", " ", "%"), "", $gpupt);
-            $mempt = shell_exec('nvidia-smi --query-gpu=utilization.memory --format=csv,noheader');
-            $mempn = str_replace(array("\r\n", "\r", "\n", "\t", " ", "%"), "", $mempt);
-
-            $bar = "<div class=\"bar\">\n";
-            $bar .= str_repeat("<i class=\"element usr\"></i>\n", $mempn);
-            $bar .= str_repeat("<i class=\"element\"></i>\n", 100 - $mempn);
-            $bar .= "</div>\n";
-            print $bar;
-
-            echo "<br/>";
-            echo "<div class=\"left\"><span class=\"type\">USE</span></div>";
-            echo "<div class=\"right\">" . "$gpupt" . "<span class=\"unit\">%</span></div><br/><br/>";
-
-            $bar = "<div class=\"bar\">\n";
-            $bar .= str_repeat("<i class=\"element usr\"></i>\n", $gpupt);
-            $bar .= str_repeat("<i class=\"element\"></i>\n", 100 - $gpupt);
-            $bar .= "</div>\n";
-            print $bar;
-
-            echo '</div>';
-        } else {
-            echo '<br/>';
-        }
-        echo '</div>';
-    }
-
-    ?>
-
-    <?php
-
-    $disks = shell_exec("df -h -P | grep -wv tmpfs | grep -wv devtmpfs");
-
-    $array = explode(PHP_EOL, $disks);
-
-    $count = count($array);
-
-    function filter($arr): bool
-    {
-        if ($arr === '' || $arr === null) {
-            return false;
-        }
-        return true;
-    }
-
-    for ($i = 1; $i < $count - 1; $i++) {
-        $modul = "<div class=\"space\"></div>";
-        $modul .= "<div class=\"module\">\n";
-
-        $arran = explode(" ", $array[$i]);
-        $arran = array_filter($arran, 'filter');
-        $arran = array_values($arran);
-        $perct = str_replace(array("%"), "", $arran[4]);
-
-        $siztn = substr($arran[1], 0, strlen($arran[1]) - 1);
-        $siztu = substr($arran[1], -1);
-
-        if ($arran[2] === '0') {
-            $sizun = 0;
-            $sizuu = $siztu;
-        } else {
-            $sizun = substr($arran[2], 0, strlen($arran[2]) - 1);
-            $sizuu = substr($arran[2], -1);
-        }
-
-        $modul .= "<div class=\"left\">$arran[0]</div>\n";
-        $modul .= "<div class=\"right\"><span class=\"type\">$arran[5]</span></div><br/><br/>\n";
-
-        $modul .= "<div class=\"right\">$sizun<span class=\"unit\">$sizuu</span><span class=\"slash\">/</span>$siztn<span class=\"unit\">$siztu</span></div><br/><br/>";
-
-        $modul .= "<div class=\"bar\">\n";
-        $modul .= str_repeat("<i class=\"element usr\"></i>\n", $perct);
-        $modul .= str_repeat("<i class=\"element\"></i>\n", 100 - $perct);
-        $modul .= "</div>\n";
-
-        $modul .= "</div>\n";
-
-        echo $modul;
-    }
-
-    ?>
-
-    </body>
-    </html>
-
-<?php
-ob_end_flush();
-?>
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServerMon - 服务器监控</title>
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=1719392798">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png?v=1719392798">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png?v=1719392798">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- 顶部导航 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1 id="hostname">Loading...</h1>
+                <span class="subtitle" id="os"></span>
+            </div>
+            
+            <div class="header-controls">
+                <div class="refresh-interval">
+                    <span class="label">刷新:</span>
+                    <button class="interval-btn" data-interval="3">3s</button>
+                    <button class="interval-btn" data-interval="5">5s</button>
+                    <button class="interval-btn" data-interval="10">10s</button>
+                    <button class="interval-btn" data-interval="30">30s</button>
+                </div>
+                
+                <button id="refreshBtn" class="icon-btn" title="立即刷新">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                    </svg>
+                </button>
+                
+                <button id="themeToggle" class="icon-btn" title="切换主题">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="header-meta">
+            <span class="meta-item">
+                <span class="meta-label">运行时间:</span>
+                <span id="uptime">-</span>
+            </span>
+            <span class="meta-item">
+                <span class="meta-label">架构:</span>
+                <span id="arch">-</span>
+            </span>
+            <span class="meta-item">
+                <span class="meta-label">更新时间:</span>
+                <span id="updateTime">-</span>
+            </span>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 系统概览 -->
+        <section class="card">
+            <div class="card-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    CPU
+                </h2>
+                <div class="card-actions">
+                    <span id="cpuLoad" class="load-avg">-</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="stat-row">
+                    <span id="cpuModel" class="stat-value">-</span>
+                    <span id="cpuCores" class="stat-secondary">-</span>
+                </div>
+                <div class="usage-display">
+                    <span id="cpuUsage" class="usage-percent">0%</span>
+                    <div class="usage-bar">
+                        <div id="cpuBar" class="bar-fill"></div>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">温度</span>
+                    <span id="cpuTemp" class="stat-value">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 内存 -->
+        <section class="card">
+            <div class="card-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 19v-14a2 2 0 012-2h8a2 2 0 012 2v14a2 2 0 01-2 2H8a2 2 0 01-2-2z"/>
+                        <line x1="6" y1="9" x2="18" y2="9"/>
+                    </svg>
+                    内存
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="usage-display">
+                    <span class="usage-text">
+                        <span id="memUsed" class="usage-percent">0 GB</span>
+                        <span id="memTotal" class="usage-total">/ 0 GB</span>
+                    </span>
+                    <div class="usage-bar">
+                        <div id="memBar" class="bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-divider"></div>
+            
+            <div class="card-body">
+                <div class="card-header">
+                    <h3>SWAP</h3>
+                </div>
+                <div class="usage-display">
+                    <span class="usage-text">
+                        <span id="swapUsed" class="usage-percent">0 GB</span>
+                        <span id="swapTotal" class="usage-total">/ 0 GB</span>
+                    </span>
+                    <div class="usage-bar">
+                        <div id="swapBar" class="bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GPU (条件显示) -->
+        <section id="gpuCard" class="card" style="display: none;">
+            <div class="card-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
+                        <rect x="9" y="9" width="6" height="6"/>
+                        <line x1="9" y1="1" x2="9" y2="4"/>
+                        <line x1="15" y1="1" x2="15" y2="4"/>
+                        <line x1="9" y1="20" x2="9" y2="23"/>
+                        <line x1="15" y1="20" x2="15" y2="23"/>
+                        <line x1="20" y1="9" x2="23" y2="9"/>
+                        <line x1="20" y1="14" x2="23" y2="14"/>
+                        <line x1="1" y1="9" x2="4" y2="9"/>
+                        <line x1="1" y1="14" x2="4" y2="14"/>
+                    </svg>
+                    GPU
+                </h2>
+                <span id="gpuModel" class="gpu-name">-</span>
+            </div>
+            <div class="card-body">
+                <div class="gpu-grid">
+                    <div class="gpu-stat">
+                        <span class="stat-label">温度</span>
+                        <span id="gpuTemp" class="stat-value">-</span>
+                    </div>
+                    <div class="gpu-stat">
+                        <span class="stat-label">显存</span>
+                        <span id="gpuMem" class="stat-value">-</span>
+                    </div>
+                    <div class="gpu-stat">
+                        <span class="stat-label">使用率</span>
+                        <span id="gpuUsage" class="stat-value">-</span>
+                    </div>
+                </div>
+                <div class="usage-bar">
+                    <div id="gpuBar" class="bar-fill"></div>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">显存使用</span>
+                    <div class="usage-bar small">
+                        <div id="gpuMemBar" class="bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 磁盘 -->
+        <section class="card">
+            <div class="card-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                    </svg>
+                    磁盘
+                </h2>
+                <span id="diskMount" class="disk-mount">/</span>
+            </div>
+            <div class="card-body">
+                <div class="usage-display">
+                    <span id="diskUsage" class="usage-text">-</span>
+                    <div class="usage-bar">
+                        <div id="diskBar" class="bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 网络 -->
+        <section class="card">
+            <div class="card-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12.55a11 11 0 0114.08 0"/>
+                        <path d="M1.42 9a16 16 0 0121.16 0"/>
+                        <path d="M8.53 16.11a6 6 0 016.95 0"/>
+                        <circle cx="12" cy="20" r="1"/>
+                    </svg>
+                    网络
+                </h2>
+                <span id="netIp" class="net-ip">-</span>
+            </div>
+            <div class="card-body">
+                <div class="net-info">
+                    <span id="netName" class="net-name">-</span>
+                    <div class="net-stats">
+                        <span id="netRx" class="net-rx">↓ -</span>
+                        <span id="netTx" class="net-tx">↑ -</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 进程 -->
+        <section class="card">
+            <div class="card-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="4,17 10,11 4,5"/>
+                        <line x1="12" y1="19" x2="20" y2="19"/>
+                    </svg>
+                    进程
+                </h2>
+                <span class="stat-label">Top 5 by CPU</span>
+            </div>
+            <div class="card-body no-padding">
+                <div id="processList" class="process-list">
+                    <div class="process-item">
+                        <span class="process-cmd">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/monitor.js"></script>
+</body>
+
+</html>
