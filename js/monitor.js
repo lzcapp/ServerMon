@@ -107,13 +107,15 @@ class ServerMonitor {
         
         // 更新CPU使用率条
         this.updateBar('cpuBar', data.cpu.usage);
-        this.updateCoreBars(data.cpu.cores || []);
+        this.updateCoreBars(data.cpu.cores_usage || []);
         
         // 内存信息
         const mem = data.memory;
-        this.updateElement('memUsed', `${mem.used} GB`);
-        this.updateElement('memTotal', `/ ${mem.total} GB`);
-        this.updateBar('memBar', Math.round((mem.used / mem.total) * 100));
+        if (mem && mem.total > 0) {
+            this.updateElement('memUsed', `${mem.used} GB`);
+            this.updateElement('memTotal', `/ ${mem.total} GB`);
+            this.updateBar('memBar', Math.round((mem.used / mem.total) * 100));
+        }
         
         // Swap信息
         if (mem.swap_total > 0) {
@@ -141,26 +143,10 @@ class ServerMonitor {
             const disk = data.disks[0]; // 主磁盘
             this.updateElement('diskMount', disk.mount);
             this.updateElement('diskUsage', `${disk.used} / ${disk.size}`);
-            this.updateBar('diskBar', disk.use_percent);
+            this.updateBar('diskBar', disk.use_percent || 0);
         }
         
-        // 网络信息
-        if (data.network && data.network.length > 0) {
-            const net = data.network[0];
-            this.updateElement('netName', net.name);
-            this.updateElement('netIp', net.ip || '-');
-            
-            if (this.previousData?.network?.[0]) {
-                const prev = this.previousData.network[0];
-                const rxRate = this.formatBytes(net.rx_bytes - prev.rx_bytes);
-                const txRate = this.formatBytes(net.tx_bytes - prev.tx_bytes);
-                this.updateElement('netRx', `↓ ${rxRate}/s`);
-                this.updateElement('netTx', `↑ ${txRate}/s`);
-            }
-        }
-        
-        // 进程信息
-        this.updateProcesses(data.processes || []);
+
     }
     
     updateElement(id, value) {

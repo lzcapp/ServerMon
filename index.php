@@ -230,52 +230,7 @@
             </div>
         </section>
 
-        <!-- 网络 -->
-        <section class="card">
-            <div class="card-header">
-                <h2>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12.55a11 11 0 0114.08 0"/>
-                        <path d="M1.42 9a16 16 0 0121.16 0"/>
-                        <path d="M8.53 16.11a6 6 0 016.95 0"/>
-                        <circle cx="12" cy="20" r="1"/>
-                    </svg>
-                    网络
-                </h2>
-                <span id="netIp" class="net-ip">-</span>
-            </div>
-            <div class="card-body">
-                <div class="net-info">
-                    <span id="netName" class="net-name">-</span>
-                    <div class="net-stats">
-                        <span id="netRx" class="net-rx">↓ -</span>
-                        <span id="netTx" class="net-tx">↑ -</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 进程 -->
-        <section class="card">
-            <div class="card-header">
-                <h2>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="4,17 10,11 4,5"/>
-                        <line x1="12" y1="19" x2="20" y2="19"/>
-                    </svg>
-                    进程
-                </h2>
-                <span class="stat-label">Top 5 by CPU</span>
-            </div>
-            <div class="card-body no-padding">
-                <div id="processList" class="process-list">
-                    <div class="process-item">
-                        <span class="process-cmd">Loading...</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+        </main>
 
     <!-- Scripts -->
     <script src="js/monitor.js"></script>

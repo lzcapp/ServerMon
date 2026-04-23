@@ -164,34 +164,54 @@ function getMemoryInfo(): array {
     
     $total = $free = $buffers = $cached = $available = $swapTotal = $swapUsed = 0;
     
-    if ($IS_LINUX && is_readable('/proc/meminfo')) {
-        $meminfo = file_get_contents('/proc/meminfo');
-        $lines = explode("\n", $meminfo);
+    if ($IS_LINUX) {
+        // 使用 free 命令更可靠
+        $freeOutput = shell_exec('free -b 2>/dev/null') ?: '';
+        $lines = array_filter(explode("\n", $freeOutput));
         
-        $data = [];
-        foreach ($lines as $line) {
-            if (strpos($line, ':') !== false) {
-                [$key, $val] = explode(':', $line, 2);
-                $data[trim($key)] = (int) trim($val);
+        if (count($lines) >= 2) {
+            // 第一行是标题，第二行是内存
+            $memLine = preg_split('/\s+/', trim($lines[1]));
+            if (count($memLine) >= 3) {
+                $total = round($memLine[1] / 1024 / 1024 / 1024, 2);
+                $used = round($memLine[2] / 1024 / 1024 / 1024, 2);
+                $free = round($memLine[3] / 1024 / 1024 / 1024, 2);
+            }
+            
+            // 获取更多细节
+            $meminfo = shell_exec('cat /proc/meminfo 2>/dev/null') ?: '';
+            $memLines = explode("\n", $meminfo);
+            $data = [];
+            foreach ($memLines as $line) {
+                if (strpos($line, ':') !== false) {
+                    [$key, $val] = explode(':', $line, 2);
+                    $data[trim($key)] = (int) trim(str_replace(' kB', '', $val));
+                }
+            }
+            $buffers = round(($data['Buffers'] ?? 0) / 1024 / 1024, 2);
+            $cached = round(($data['Cached'] ?? 0) / 1024 / 1024, 2);
+            $available = round(($data['MemAvailable'] ?? $free) / 1024 / 1024, 2);
+            
+            if ($total > 0 && $used === 0) {
+                $used = round($total - $free - $buffers - $cached, 2);
+            }
+            
+            // Swap
+            if (count($lines) >= 3) {
+                $swapLine = preg_split('/\s+/', trim($lines[2]));
+                if (count($swapLine) >= 3) {
+                    $swapTotal = round($swapLine[1] / 1024 / 1024 / 1024, 2);
+                    $swapUsed = round($swapLine[2] / 1024 / 1024 / 1024, 2);
+                }
             }
         }
-        
-        $total = ($data['MemTotal'] ?? 0) / 1024 / 1024;
-        $free = ($data['MemFree'] ?? 0) / 1024 / 1024;
-        $buffers = ($data['Buffers'] ?? 0) / 1024 / 1024;
-        $cached = ($data['Cached'] ?? 0) / 1024 / 1024;
-        $available = ($data['MemAvailable'] ?? $free) / 1024 / 1024;
-        $swapTotal = ($data['SwapTotal'] ?? 0) / 1024 / 1024;
-        $swapFree = ($data['SwapFree'] ?? 0) / 1024 / 1024;
-        $swapUsed = $swapTotal - $swapFree;
     } else {
         // macOS
         $total = round((float) shell_exec('sysctl -n hw.memsize') / 1024 / 1024 / 1024, 2);
         $free = round((float) shell_exec('vm_stat | grep "Pages free:" | grep -oE "[0-9]+"') * 4096 / 1024 / 1024 / 1024, 2);
         $available = $free;
+        $used = round($total - $free, 2);
     }
-    
-    $used = $total - $free - $buffers - $cached;
     
     return [
         'total' => round($total, 2),
@@ -260,24 +280,44 @@ function getDiskInfo(): array {
     $disks = [];
     
     if ($IS_LINUX) {
-        $output = shell_exec("df -h -P 2>/dev/null | grep -wv tmpfs | grep -wv devtmpfs | grep -wv 'udev'") ?: '';
+        // 使用 df -B1 获取字节单位，更容易解析
+        $output = shell_exec("df -B1 2>/dev/null | grep -v 'tmpfs\|devtmpfs\|udev'") ?: '';
         $lines = array_filter(explode("\n", $output));
         
-        foreach ($lines as $line) {
-            $parts = array_values(array_filter(explode(' ', $line)));
+        foreach ($lines as $i => $line) {
+            // 跳过标题行
+            if ($i === 0 || strpos($line, 'Filesystem') !== false) continue;
+            
+            $parts = preg_split('/\s+/', trim($line));
             if (count($parts) < 6) continue;
             
+            $device = $parts[0];
+            // 跳过虚拟文件系统
+            if (strpos($device, '/dev/') === false && strpos($device, '/mnt') === false && strpos($device, '/home') === false && strpos($device, '/') !== 0) {
+                continue;
+            }
+            
+            $total = (int) $parts[1];
+            $used = (int) $parts[2];
+            $available = (int) $parts[3];
+            $usePercent = (int) str_replace('%', '', $parts[4]);
+            $mount = $parts[5];
+            
+            // 转换大小为 GB
+            $totalGB = round($total / 1024 / 1024 / 1024, 1);
+            $usedGB = round($used / 1024 / 1024 / 1024, 1);
+            
             $disks[] = [
-                'device' => $parts[0],
-                'mount' => $parts[5],
-                'size' => $parts[1],
-                'used' => $parts[2],
-                'use_percent' => (int) str_replace('%', '', $parts[4]),
+                'device' => $device,
+                'mount' => $mount,
+                'size' => $totalGB . 'G',
+                'used' => $usedGB . 'G',
+                'use_percent' => $usePercent,
             ];
         }
     } else {
         // macOS
-        $output = shell_exec('df -h 2>/dev/null') ?: '';
+        $output = shell_exec('df -g 2>/dev/null') ?: '';
         $lines = array_filter(explode("\n", $output));
         
         foreach (array_slice($lines, 1) as $line) {
@@ -287,16 +327,12 @@ function getDiskInfo(): array {
             $mount = $parts[count($parts) - 1];
             if (in_array($mount, ['/dev', '/run', '/snap', '/boot'])) continue;
             
-            $size = $parts[1];
-            $used = $parts[3];
-            $usePercent = (int) str_replace('%', '', $parts[4]);
-            
             $disks[] = [
                 'device' => $parts[0],
                 'mount' => $mount,
-                'size' => $size,
-                'used' => $used,
-                'use_percent' => $usePercent,
+                'size' => $parts[1] . 'G',
+                'used' => $parts[2] . 'G',
+                'use_percent' => (int) str_replace('%', '', $parts[4]),
             ];
         }
     }
@@ -311,22 +347,46 @@ function getNetworkInfo(): array {
     $networks = [];
     
     if ($IS_LINUX) {
-        $output = shell_exec("cat /proc/net/dev 2>/dev/null | grep -v 'lo:' | tail -n +3") ?: '';
-        $lines = array_filter(explode("\n", $output));
+        // 使用 ip 命令获取网络接口和IP
+        $ipOutput = shell_exec("ip -o link show 2>/dev/null | grep -v 'lo:'") ?: '';
+        $ipLines = array_filter(explode("\n", $ipOutput));
         
-        foreach ($lines as $line) {
-            $parts = preg_split('/\s+/', trim($line));
-            if (count($parts) < 10) continue;
-            
-            $name = rtrim($parts[0], ':');
-            $ip = trim(shell_exec("ip -4 addr show $name 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1") ?: '');
-            
-            $networks[] = [
-                'name' => $name,
-                'ip' => $ip,
-                'rx_bytes' => (int) $parts[1],
-                'tx_bytes' => (int) $parts[9],
-            ];
+        foreach ($ipLines as $line) {
+            // 提取接口名
+            if (preg_match('/^\d+:\s+(\S+):/', $line, $match)) {
+                $name = $match[1];
+                // 跳过虚拟接口
+                if (strpos($name, '@') !== false || strpos($name, '.') !== false) continue;
+                
+                // 获取IP
+                $ip = trim(shell_exec("ip -4 addr show $name 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1") ?: '');
+                
+                // 获取流量
+                $netDev = file_get_contents('/proc/net/dev');
+                $lines = explode("\n", $netDev);
+                $rxBytes = 0;
+                $txBytes = 0;
+                
+                foreach ($lines as $devLine) {
+                    if (strpos($devLine, $name . ':') !== false || strpos($devLine, $name) === 0) {
+                        $parts = preg_split('/\s+/', trim($devLine));
+                        if (count($parts) >= 10) {
+                            $rxBytes = (int) $parts[1];
+                            $txBytes = (int) $parts[9];
+                        }
+                        break;
+                    }
+                }
+                
+                if ($ip || $rxBytes > 0 || $txBytes > 0) {
+                    $networks[] = [
+                        'name' => $name,
+                        'ip' => $ip,
+                        'rx_bytes' => $rxBytes,
+                        'tx_bytes' => $txBytes,
+                    ];
+                }
+            }
         }
     } else {
         // macOS
@@ -403,10 +463,9 @@ try {
         'memory' => getMemoryInfo(),
         'gpu' => getGpuInfo(),
         'disks' => getDiskInfo(),
-        'network' => getNetworkInfo(),
-        'processes' => getTopProcesses(),
     ];
     
+    // cores_usage 需要 Cookie 支持跨请求计算，暂时设为空数组
     $response['cpu']['cores_usage'] = [];
     
 } catch (Exception $e) {
