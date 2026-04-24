@@ -95,10 +95,12 @@ function getCpuInfo(): array {
     if ($IS_LINUX) {
         // CPU型号
         $cpuInfo = shell_exec("grep -i 'model name' /proc/cpuinfo 2>/dev/null | head -1") ?: '';
-        $model = trim(str_ireplace('Model name:', '', $cpuInfo));
+        // 正则替换（无视空格数量 + 忽略大小写）+ 清理首尾空格
+        $model = trim(preg_replace('/^model name\s*:/i', '', $cpuInfo));
+        // 兜底逻辑（Hardware 也用同样方式处理）
         if (!$model) {
             $hardwareInfo = shell_exec("grep -i 'Hardware' /proc/cpuinfo 2>/dev/null | head -1") ?: '';
-            $model = trim(str_ireplace('Hardware:', '', $hardwareInfo)) ?: 'Unknown';
+            $model = trim(preg_replace('/^Hardware\s*:/i', '', $hardwareInfo)) ?: 'Unknown';
         }
         $model = clean($model);
         
