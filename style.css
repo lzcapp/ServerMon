@@ -102,6 +102,7 @@ body {
 .logo .subtitle {
     font-size: 0.85rem;
     color: var(--text-secondary);
+    margin-left: 0;
 }
 
 .header-controls {
