@@ -135,9 +135,6 @@ class ServerMonitor {
             this.renderBar('cpuBar', [{ cls: 'usr', count: cpu.usage }]);
         }
 
-        // 每核条（API 提供 cores_usage 时渲染）
-        this.updateCoreBars(cpu.cores_usage || []);
-
         // 内存模块（单色显示 used）
         const mem = data.memory;
         if (mem && mem.total > 0) {
@@ -234,31 +231,6 @@ class ServerMonitor {
         const bar = document.getElementById(barId);
         if (!bar) return;
         bar.innerHTML = this.buildBarHtml(segments, total);
-    }
-
-    updateCoreBars(cores) {
-        const container = document.getElementById('coreBars');
-        if (!container) return;
-
-        if (cores.length > 0) {
-            // 所有核并成一行：每核一个等宽小条（8格），内部按状态分色
-            const perCore = 8;
-            let html = '<div class="core-row">';
-            cores.forEach(core => {
-                const segments = [
-                    { cls: 'usr', count: perCore * (core.user || 0) / 100 },
-                    { cls: 'sys', count: perCore * (core.sys || 0) / 100 },
-                    { cls: 'blu', count: perCore * (core.iowait || 0) / 100 },
-                    { cls: 'yel', count: perCore * (core.steal || 0) / 100 }
-                ];
-                html += `<div class="bar">${this.buildBarHtml(segments, perCore)}</div>`;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        } else {
-            // API 无每核数据时清空占位
-            container.innerHTML = '';
-        }
     }
 
     formatUptime(str) {
