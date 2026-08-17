@@ -196,15 +196,11 @@ class ServerMonitor {
     }
 
     /**
-     * 渲染方块进度条
-     * @param {string} barId DOM id
+     * 生成方块条 HTML（不写入 DOM，供拼接场景复用）
      * @param {Array<{cls: string, count: number}>} segments 色段（cls: usr/sys/blu/yel/gry/空）
      * @param {number} total 总方块数
      */
-    renderBar(barId, segments, total = 60) {
-        const bar = document.getElementById(barId);
-        if (!bar) return;
-
+    buildBarHtml(segments, total = 60) {
         const counts = segments.map(s => Math.max(0, Math.round(s.count)));
         let used = counts.reduce((a, b) => a + b, 0);
 
@@ -225,7 +221,19 @@ class ServerMonitor {
         });
         html += `<i class="element"></i>`.repeat(Math.max(0, total - used));
 
-        bar.innerHTML = html;
+        return html;
+    }
+
+    /**
+     * 渲染方块进度条
+     * @param {string} barId DOM id
+     * @param {Array<{cls: string, count: number}>} segments 色段（cls: usr/sys/blu/yel/gry/空）
+     * @param {number} total 总方块数
+     */
+    renderBar(barId, segments, total = 60) {
+        const bar = document.getElementById(barId);
+        if (!bar) return;
+        bar.innerHTML = this.buildBarHtml(segments, total);
     }
 
     updateCoreBars(cores) {
@@ -233,28 +241,20 @@ class ServerMonitor {
         if (!container) return;
 
         if (cores.length > 0) {
-            // 动态生成每核方块条（按状态分色：usr=用户态/sys=系统态/blu=IO等待/yel=Steal）
-            let html = '';
-            cores.forEach((core, index) => {
-                const usage = core.usage || 0;
-                html += `
-                    <div class="space-sm"></div>
-                    <div class="left"><span class="type">CORE${index + 1}</span></div>
-                    <div class="right">${usage}<span class="unit">%</span></div>
-                    <div class="clear"></div>
-                    <div class="bar" id="coreBar${index}"></div>
-                `;
+            // 所有核并成一行：每核一个等宽小条（8格），内部按状态分色
+            const perCore = 8;
+            let html = '<div class="core-row">';
+            cores.forEach(core => {
+                const segments = [
+                    { cls: 'usr', count: perCore * (core.user || 0) / 100 },
+                    { cls: 'sys', count: perCore * (core.sys || 0) / 100 },
+                    { cls: 'blu', count: perCore * (core.iowait || 0) / 100 },
+                    { cls: 'yel', count: perCore * (core.steal || 0) / 100 }
+                ];
+                html += `<div class="bar">${this.buildBarHtml(segments, perCore)}</div>`;
             });
+            html += '</div>';
             container.innerHTML = html;
-
-            cores.forEach((core, index) => {
-                this.renderBar(`coreBar${index}`, [
-                    { cls: 'usr', count: core.user },
-                    { cls: 'sys', count: core.sys },
-                    { cls: 'blu', count: core.iowait },
-                    { cls: 'yel', count: core.steal }
-                ]);
-            });
         } else {
             // API 无每核数据时清空占位
             container.innerHTML = '';
