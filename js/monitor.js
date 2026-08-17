@@ -128,20 +128,14 @@ class ServerMonitor {
         // 每核条（API 提供 cores_usage 时渲染）
         this.updateCoreBars(cpu.cores_usage || []);
 
-        // 内存模块（分段：used / buffers / cached）
+        // 内存模块（单色显示 used）
         const mem = data.memory;
         if (mem && mem.total > 0) {
             this.updateText('memUsed', mem.used.toFixed(2));
             this.updateText('memTotal', mem.total.toFixed(2));
 
             const usedPct = Math.round((mem.used / mem.total) * 100);
-            const buffPct = mem.buffers > 0 ? Math.round((mem.buffers / mem.total) * 100) : 0;
-            const cachePct = mem.cached > 0 ? Math.round((mem.cached / mem.total) * 100) : 0;
-            this.renderBar('memBar', [
-                { cls: 'usr', count: usedPct },
-                { cls: 'blu', count: buffPct },
-                { cls: 'gry', count: cachePct }
-            ]);
+            this.renderBar('memBar', [{ cls: 'usr', count: usedPct }]);
         }
 
         // Swap
