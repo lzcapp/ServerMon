@@ -4,7 +4,7 @@
 
 class ServerMonitor {
     constructor() {
-        this.interval = parseInt(localStorage.getItem('refreshInterval')) || 5;
+        this.interval = parseInt(localStorage.getItem('refreshInterval')) || 1;
         this.timer = null;
         this.previousData = null;
 
@@ -14,6 +14,7 @@ class ServerMonitor {
     init() {
         this.loadSettings();
         this.bindEvents();
+        this.updateIntervalButtons();
         this.fetchData();
         this.startAutoRefresh();
     }
