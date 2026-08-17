@@ -25,7 +25,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="style.css?v=3" rel="stylesheet">
+    <link href="style.css?v=4" rel="stylesheet">
 </head>
 
 <body>
@@ -95,8 +95,6 @@
             <div class="right" id="cpuStats">-</div>
             <div class="clear"></div>
 
-            <div class="bar" id="cpuBar"><i class="element"></i></div>
-
             <div id="coreBars"></div>
         </div>
 
@@ -157,7 +155,7 @@
     </main>
 
     <!-- Scripts -->
-    <script src="js/monitor.js?v=3"></script>
+    <script src="js/monitor.js?v=4"></script>
 </body>
 
 </html>

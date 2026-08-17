@@ -123,19 +123,6 @@ class ServerMonitor {
         }
         this.updateElement('cpuStats', stats.join('&nbsp;'));
 
-        // CPU使用率条（按状态分色：usr=用户态/sys=系统态/blu=IO等待/yel=Steal）
-        if (cpu.user !== undefined) {
-            this.renderBar('cpuBar', [
-                { cls: 'usr', count: cpu.user },
-                { cls: 'sys', count: cpu.sys },
-                { cls: 'blu', count: cpu.iowait },
-                { cls: 'yel', count: cpu.steal }
-            ]);
-        } else {
-            // 旧接口兜底：单色显示
-            this.renderBar('cpuBar', [{ cls: 'usr', count: cpu.usage }]);
-        }
-
         // 每核行（API 提供 cores_usage 时渲染，每核一行、无标签无占用、上下紧凑）
         this.updateCoreBars(cpu.cores_usage || []);
 
