@@ -91,6 +91,7 @@ function getCpuInfo(): array {
     $cores = 1;
     $temp = 0;
     $usage = 0;
+    $coresUsage = [];
     
     if ($IS_LINUX) {
         // CPU型号
@@ -115,35 +116,56 @@ function getCpuInfo(): array {
             $temp = (int) round((float) file_get_contents($tempFile[0]) / 1000);
         }
         
-        // CPU使用率
-        $stat = clean(shell_exec("cat /proc/stat | head -1") ?: '');
-        $current = array_values(array_filter(explode(' ', $stat)));
-        $prev = getPrevCpuData('core0');
-        
-        if ($prev && count($current) >= 5) {
-            $prevIdle = (int) ($prev[4] ?? 0);
-            $currIdle = (int) ($current[4] ?? 0);
-            
-            $prevTotal = 0;
-            for ($i = 1; $i < count($prev); $i++) {
-                $prevTotal += (int) ($prev[$i] ?? 0);
+        // CPU使用率（整机 + 每核，按用户态/系统态/IO等待/Steal 分色）
+        $statAll = shell_exec("cat /proc/stat 2>/dev/null | grep '^cpu'") ?: '';
+        $statLines = array_values(array_filter(explode("\n", $statAll)));
+
+        foreach ($statLines as $idx => $line) {
+            $cols = array_values(array_filter(explode(' ', trim($line))));
+            if (count($cols) < 5) continue;
+
+            // 整机行存 core0，每个核心依次 core1、core2...
+            $key = $idx === 0 ? 'core0' : 'core' . $idx;
+            $prev = getPrevCpuData($key);
+
+            $u = $s = $io = $st = 0;
+            if ($prev && count($prev) >= 5) {
+                // 差值计算：user+nice=用户态, system=系统态, iowait=IO等待, steal=被抢占
+                $du = (int) ($cols[1] ?? 0) - (int) ($prev[1] ?? 0);
+                $dn = (int) ($cols[2] ?? 0) - (int) ($prev[2] ?? 0);
+                $ds = (int) ($cols[3] ?? 0) - (int) ($prev[3] ?? 0);
+                $didle = (int) ($cols[4] ?? 0) - (int) ($prev[4] ?? 0);
+                $dio = (int) ($cols[5] ?? 0) - (int) ($prev[5] ?? 0);
+                $dst = (int) ($cols[8] ?? 0) - (int) ($prev[8] ?? 0);
+
+                $total = $du + $dn + $ds + $didle + $dio + $dst;
+
+                if ($total > 0) {
+                    $u = round(100 * ($du + $dn) / $total);
+                    $s = round(100 * $ds / $total);
+                    $io = round(100 * $dio / $total);
+                    $st = round(100 * $dst / $total);
+                }
             }
-            
-            $currTotal = 0;
-            for ($i = 1; $i < count($current); $i++) {
-                $currTotal += (int) ($current[$i] ?? 0);
+
+            saveCpuData($key, $cols);
+
+            if ($idx === 0) {
+                // 整机：usage = 四种忙状态之和，与分段条严格一致
+                $usage = $u + $s + $io + $st;
+                $totalUser = $u;
+                $totalSys = $s;
+                $totalIo = $io;
+                $totalSteal = $st;
+            } else {
+                $coresUsage[] = [
+                    'usage' => $u + $s + $io + $st,
+                    'user' => $u,
+                    'sys' => $s,
+                    'iowait' => $io,
+                    'steal' => $st,
+                ];
             }
-            
-            $idleDiff = $currIdle - $prevIdle;
-            $totalDiff = $currTotal - $prevTotal;
-            
-            if ($totalDiff > 0) {
-                $usage = round(100 * ($totalDiff - $idleDiff) / $totalDiff);
-            }
-        }
-        
-        if (count($current) >= 5) {
-            saveCpuData('core0', $current);
         }
     } else {
         // macOS
@@ -160,6 +182,11 @@ function getCpuInfo(): array {
         'cores' => max(1, $cores),
         'temperature' => $temp,
         'usage' => $usage,
+        'user' => $totalUser ?? 0,
+        'sys' => $totalSys ?? 0,
+        'iowait' => $totalIo ?? 0,
+        'steal' => $totalSteal ?? 0,
+        'cores_usage' => $coresUsage,
     ];
 }
 
@@ -469,9 +496,6 @@ try {
         'gpu' => getGpuInfo(),
         'disks' => getDiskInfo(),
     ];
-    
-    // cores_usage 需要 Cookie 支持跨请求计算，暂时设为空数组
-    $response['cpu']['cores_usage'] = [];
     
 } catch (Exception $e) {
     $response = [

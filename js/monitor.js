@@ -122,8 +122,18 @@ class ServerMonitor {
         }
         this.updateElement('cpuStats', stats.join('&nbsp;'));
 
-        // CPU使用率条（单色）
-        this.renderBar('cpuBar', [{ cls: 'usr', count: cpu.usage }]);
+        // CPU使用率条（按状态分色：usr=用户态/sys=系统态/blu=IO等待/yel=Steal）
+        if (cpu.user !== undefined) {
+            this.renderBar('cpuBar', [
+                { cls: 'usr', count: cpu.user },
+                { cls: 'sys', count: cpu.sys },
+                { cls: 'blu', count: cpu.iowait },
+                { cls: 'yel', count: cpu.steal }
+            ]);
+        } else {
+            // 旧接口兜底：单色显示
+            this.renderBar('cpuBar', [{ cls: 'usr', count: cpu.usage }]);
+        }
 
         // 每核条（API 提供 cores_usage 时渲染）
         this.updateCoreBars(cpu.cores_usage || []);
@@ -223,20 +233,27 @@ class ServerMonitor {
         if (!container) return;
 
         if (cores.length > 0) {
-            // 动态生成每核方块条
+            // 动态生成每核方块条（按状态分色：usr=用户态/sys=系统态/blu=IO等待/yel=Steal）
             let html = '';
-            cores.forEach((usage, index) => {
+            cores.forEach((core, index) => {
+                const usage = core.usage || 0;
                 html += `
                     <div class="space-sm"></div>
                     <div class="left"><span class="type">CORE${index + 1}</span></div>
+                    <div class="right">${usage}<span class="unit">%</span></div>
                     <div class="clear"></div>
                     <div class="bar" id="coreBar${index}"></div>
                 `;
             });
             container.innerHTML = html;
 
-            cores.forEach((usage, index) => {
-                this.renderBar(`coreBar${index}`, [{ cls: 'usr', count: usage }]);
+            cores.forEach((core, index) => {
+                this.renderBar(`coreBar${index}`, [
+                    { cls: 'usr', count: core.user },
+                    { cls: 'sys', count: core.sys },
+                    { cls: 'blu', count: core.iowait },
+                    { cls: 'yel', count: core.steal }
+                ]);
             });
         } else {
             // API 无每核数据时清空占位
