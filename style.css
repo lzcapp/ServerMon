@@ -126,17 +126,19 @@ h2 {
 /* === Block Bar === */
 .bar {
     display: grid;
-    grid-template-columns: repeat(60, 1fr);
+    grid-template-columns: repeat(60, minmax(0, 1fr));
     gap: 2px;
     margin-top: 8px;
     margin-bottom: 2px;
     width: 100%;
+    overflow: hidden;
 }
 
 .element {
     background-color: var(--bg-elem);
     border-radius: 10%;
     width: 100%;
+    min-width: 0;
     height: 1.1vh;
 }
 

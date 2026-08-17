@@ -25,7 +25,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="style.css?v=2" rel="stylesheet">
+    <link href="style.css?v=3" rel="stylesheet">
 </head>
 
 <body>
@@ -157,7 +157,7 @@
     </main>
 
     <!-- Scripts -->
-    <script src="js/monitor.js?v=2"></script>
+    <script src="js/monitor.js?v=3"></script>
 </body>
 
 </html>
