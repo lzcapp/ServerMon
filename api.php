@@ -112,7 +112,7 @@ function getCpuInfo(): array {
         // 温度
         $tempFile = glob('/sys/class/thermal/thermal_zone*/temp');
         if (!empty($tempFile) && is_readable($tempFile[0])) {
-            $temp = round((float) file_get_contents($tempFile[0]) / 1000, 1);
+            $temp = (int) round((float) file_get_contents($tempFile[0]) / 1000);
         }
         
         // CPU使用率
