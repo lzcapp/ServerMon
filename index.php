@@ -96,6 +96,8 @@
             <div class="clear"></div>
 
             <div class="bar" id="cpuBar"><i class="element"></i></div>
+
+            <div id="coreBars"></div>
         </div>
 
         <!-- 内存 -->

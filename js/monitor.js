@@ -135,6 +135,9 @@ class ServerMonitor {
             this.renderBar('cpuBar', [{ cls: 'usr', count: cpu.usage }]);
         }
 
+        // 每核行（API 提供 cores_usage 时渲染，每核一行、无标签无占用、上下紧凑）
+        this.updateCoreBars(cpu.cores_usage || []);
+
         // 内存模块（单色显示 used）
         const mem = data.memory;
         if (mem && mem.total > 0) {
@@ -231,6 +234,29 @@ class ServerMonitor {
         const bar = document.getElementById(barId);
         if (!bar) return;
         bar.innerHTML = this.buildBarHtml(segments, total);
+    }
+
+    updateCoreBars(cores) {
+        const container = document.getElementById('coreBars');
+        if (!container) return;
+
+        if (cores.length > 0) {
+            // 每核一行：纯方块条，无核心名称、无占用百分比，行间紧凑（上下合在一起）
+            let html = '';
+            cores.forEach(core => {
+                const segments = [
+                    { cls: 'usr', count: core.user || 0 },
+                    { cls: 'sys', count: core.sys || 0 },
+                    { cls: 'blu', count: core.iowait || 0 },
+                    { cls: 'yel', count: core.steal || 0 }
+                ];
+                html += `<div class="bar core-bar">${this.buildBarHtml(segments, 60)}</div>`;
+            });
+            container.innerHTML = html;
+        } else {
+            // API 无每核数据时清空占位
+            container.innerHTML = '';
+        }
     }
 
     formatUptime(str) {

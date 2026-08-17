@@ -140,6 +140,12 @@ h2 {
     height: 1.1vh;
 }
 
+/* 每核行：上下紧凑贴合（与整机条之间的间隔由 .bar 默认 margin 提供） */
+.bar.core-bar {
+    margin-top: 2px;
+    margin-bottom: 0;
+}
+
 /* 彩色方块段 */
 .usr {
     background-color: var(--usr);
