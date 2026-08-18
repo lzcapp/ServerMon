@@ -155,7 +155,7 @@
     </main>
 
     <!-- Scripts -->
-    <script src="js/monitor.js?v=4"></script>
+    <script src="js/monitor.js?v=5"></script>
 </body>
 
 </html>

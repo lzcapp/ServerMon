@@ -199,6 +199,18 @@ class ServerMonitor {
                 counts[i] = Math.max(0, Math.round(counts[i] * scale));
             }
             used = counts.reduce((a, b) => a + b, 0);
+
+            // 四舍五入后仍可能超过 total（如 61 格），从尾部裁剪到正好 total，
+            // 避免 grid 因第 61 个方块自动创建第二行导致换行
+            if (used > total) {
+                let drop = used - total;
+                for (let i = counts.length - 1; i >= 0 && drop > 0; i--) {
+                    const cut = Math.min(counts[i], drop);
+                    counts[i] -= cut;
+                    drop -= cut;
+                }
+                used = total;
+            }
         }
 
         let html = '';
