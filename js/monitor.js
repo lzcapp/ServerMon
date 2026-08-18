@@ -189,37 +189,35 @@ class ServerMonitor {
      * @param {number} total 总方块数
      */
     buildBarHtml(segments, total = 60) {
-        const counts = segments.map(s => Math.max(0, Math.round(s.count)));
-        let used = counts.reduce((a, b) => a + b, 0);
+        // 各段权重（百分比，允许小数，避免先取整引入累积误差）
+        const weights = segments.map(s => Math.max(0, s.count));
+        const sumW = weights.reduce((a, b) => a + b, 0);
 
-        // 超出总块数时按比例缩放
-        if (used > total) {
-            const scale = total / used;
-            for (let i = 0; i < counts.length; i++) {
-                counts[i] = Math.max(0, Math.round(counts[i] * scale));
-            }
-            used = counts.reduce((a, b) => a + b, 0);
+        // 总使用率(百分比) → 总格数：四舍五入到最近格数。
+        // 先定总数再分配，杜绝"不满100%却显示满条"（如97%被分成4段各自进位成60格）。
+        const totalBlocks = Math.min(total, Math.round(sumW / 100 * total));
+        if (totalBlocks <= 0) {
+            return `<i class="element"></i>`.repeat(total);
+        }
 
-            // 四舍五入后仍可能超过 total（如 61 格），从尾部裁剪到正好 total，
-            // 避免 grid 因第 61 个方块自动创建第二行导致换行
-            if (used > total) {
-                let drop = used - total;
-                for (let i = counts.length - 1; i >= 0 && drop > 0; i--) {
-                    const cut = Math.min(counts[i], drop);
-                    counts[i] -= cut;
-                    drop -= cut;
-                }
-                used = total;
-            }
+        // 把 totalBlocks 格按权重分给各段：最大余数法，保证各段和严格等于 totalBlocks
+        const raw = weights.map(w => w / sumW * totalBlocks);
+        const blocks = raw.map(Math.floor);
+        let left = totalBlocks - blocks.reduce((a, b) => a + b, 0);
+        const order = raw
+            .map((v, i) => ({ i, r: v - blocks[i] }))
+            .sort((a, b) => b.r - a.r);
+        for (let k = 0; k < left; k++) {
+            blocks[order[k].i]++;
         }
 
         let html = '';
         segments.forEach((seg, i) => {
-            if (counts[i] > 0) {
-                html += `<i class="element ${seg.cls}"></i>`.repeat(counts[i]);
+            if (blocks[i] > 0) {
+                html += `<i class="element ${seg.cls}"></i>`.repeat(blocks[i]);
             }
         });
-        html += `<i class="element"></i>`.repeat(Math.max(0, total - used));
+        html += `<i class="element"></i>`.repeat(Math.max(0, total - totalBlocks));
 
         return html;
     }
